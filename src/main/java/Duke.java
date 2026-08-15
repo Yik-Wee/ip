@@ -1,3 +1,7 @@
+/**
+ * Entrypoint of the Duke application
+ * Duke
+ */
 public class Duke {
     public static void main(String[] args) {
         String banner = " ____        _        \n"

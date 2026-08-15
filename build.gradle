@@ -38,6 +38,8 @@ test {
 
 application {
     mainClass = 'Grug'
+    // To properly display UTF-8 characters when run (see https://github.com/gradle/gradle/issues/28959)
+    applicationDefaultJvmArgs = ['-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8']
 }
 
 jar {

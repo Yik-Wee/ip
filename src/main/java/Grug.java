@@ -20,23 +20,33 @@ public class Grug {
 
     private static final Scanner STDIN_SCANNER = new Scanner(System.in);
 
-    private static ArrayList<String> tasks = new ArrayList<>(100);
+    private static ArrayList<Task> tasks = new ArrayList<>(100);
 
     /**
      * Converts the user's input to the appropriate {@link GrugCommand} and exeuctes
      * the command.
      *
-     * @return the command that was parsed from the user input
+     * @return true if program should exit, false otherwise.
      */
-    private static GrugCommand handleUserInput() {
+    private static boolean handleUserInput() {
         System.out.print("> ");
         String input = STDIN_SCANNER.nextLine().strip();
 
-        GrugCommand command = GrugCommand.from(input);
-        command.execute(tasks);
-        System.out.println(DIALOG_SEP);
+        try {
+            GrugCommand command = GrugCommand.from(input);
+            command.execute(tasks);
+            System.out.println(DIALOG_SEP);
 
-        return command;
+            boolean shouldExit = switch (command) {
+                case GrugCommand.Quit() -> true;
+                default -> false;
+            };
+            return shouldExit;
+        } catch (GrugCommandParserException e) {
+            System.out.println(e.getMessage());
+            System.out.println(DIALOG_SEP);
+            return false;
+        }
     }
 
     public static void main(String[] args) {
@@ -46,12 +56,7 @@ public class Grug {
 
         boolean done = false;
         while (!done) {
-            GrugCommand command = handleUserInput();
-            switch (command) {
-                case GrugCommand.Quit() -> done = true;
-                default -> {
-                }
-            }
+            done = handleUserInput();
         }
     }
 }

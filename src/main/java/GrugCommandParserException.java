@@ -1,0 +1,23 @@
+/**
+ * The base class for the (checked) exceptions thrown when there was an error
+ * parsing the user input as a {@link GrugCommand}.
+ *
+ * Note that this is a checked exception, instead of a runtime exception, since
+ * the caller trying to parse a user inputted command *should* expect that an
+ * exception is very likely to occur.
+ */
+public class GrugCommandParserException extends Exception {
+    public GrugCommandParserException(String msg) {
+        super(msg);
+    }
+
+    /**
+     * Represents the error state when an invalid argument is supplied to a
+     * valid command
+     */
+    public static final class InvalidArgument extends GrugCommandParserException {
+        public InvalidArgument(String command, String reason) {
+            super("Invalid argument(s) for `%s`: %s".formatted(command, reason));
+        }
+    }
+}

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -19,27 +20,23 @@ public class Grug {
 
     private static final Scanner STDIN_SCANNER = new Scanner(System.in);
 
-    private static enum GrugCommand {
-        Echo,
-        Quit
-    }
+    private static ArrayList<String> tasks = new ArrayList<>(100);
 
     /**
-     * Echoes back the user's input. exits when the user types "bye".
+     * Converts the user's input to the appropriate {@link GrugCommand} and exeuctes
+     * the command.
      *
-     * @return true if user quits, false otherwise
+     * @return the command that was parsed from the user input
      */
     private static GrugCommand handleUserInput() {
         System.out.print("> ");
         String input = STDIN_SCANNER.nextLine().strip();
 
-        if (input.equals("bye")) {
-            return GrugCommand.Quit;
-        }
-
-        System.out.println(input);
+        GrugCommand command = GrugCommand.from(input);
+        command.execute(tasks);
         System.out.println(DIALOG_SEP);
-        return GrugCommand.Echo;
+
+        return command;
     }
 
     public static void main(String[] args) {
@@ -50,12 +47,11 @@ public class Grug {
         boolean done = false;
         while (!done) {
             GrugCommand command = handleUserInput();
-            if (command == GrugCommand.Quit) {
-                done = true;
+            switch (command) {
+                case GrugCommand.Quit() -> done = true;
+                default -> {
+                }
             }
         }
-
-        System.out.println("Unga. Bye. さよなら");
-        System.out.println(DIALOG_SEP);
     }
 }

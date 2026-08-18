@@ -8,6 +8,13 @@ import java.util.List;
  * flags
  */
 public class ArgParser {
+    /**
+     * Immutable record to hold the result of the parsing.
+     *
+     * @param command    The main command.
+     * @param inputs     The non-flag inputs passed to the command.
+     * @param flagValues A HashMap that maps the flag to its values.
+     */
     record ParsedArgs(String command, List<String> inputs, HashMap<String, List<String>> flagValues) {
     };
 
@@ -33,6 +40,11 @@ public class ArgParser {
      *     }
      * );
      * }</pre>
+     * 
+     * Also, command, inputs, and flagValues are guaranteed to be non-null. However,
+     * {@code flagValues.get("/flag")} is guaranteed to be null if the flag did not
+     * appear in {@code args[]}, and guaranteed to be an empty list if the flag
+     * appeared without declaring its values, e.g. {@code cmd something /flag}
      *
      * @param args  The args to parse.
      * @param flags The flags we want to obtain the values of (e.g.

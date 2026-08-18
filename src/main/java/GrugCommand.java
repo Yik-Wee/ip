@@ -157,7 +157,7 @@ public sealed interface GrugCommand {
             List<String> detailsTokens = parsedArgs.inputs();
             List<String> deadlineTokens = parsedArgs.flagValues().get("/by");
 
-            if (detailsTokens.isEmpty() || deadlineTokens.isEmpty()) {
+            if (detailsTokens.isEmpty() || deadlineTokens == null || deadlineTokens.isEmpty()) {
                 throw new GrugCommandParserException.InvalidUsage("deadline <details> /by <deadline>");
             }
 
@@ -197,7 +197,18 @@ public sealed interface GrugCommand {
             }
 
             ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of("/from", "/to"));
-            if (parsedArgs.inputs().isEmpty()) {
+            List<String> detailsTokens = parsedArgs.inputs();
+            // these can be null or empty
+            List<String> fromTokens = parsedArgs.flagValues().get("/from");
+            List<String> toTokens = parsedArgs.flagValues().get("/to");
+
+            // fromTokens and toTokens can be null if the user omits those flags.
+            // But if the user passes the flag without the value (e.g. "event abc /from
+            // /to") then fromTokens and toTokens will be empty lists, which is also
+            // invalid.
+            if (detailsTokens.isEmpty()
+                    || fromTokens == null || fromTokens.isEmpty()
+                    || toTokens == null || toTokens.isEmpty()) {
                 throw new GrugCommandParserException.InvalidUsage("event <details> /from <from> /to <to>");
             }
 

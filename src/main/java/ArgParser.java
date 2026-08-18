@@ -40,7 +40,7 @@ public class ArgParser {
      *     }
      * );
      * }</pre>
-     * 
+     *
      * Also, command, inputs, and flagValues are guaranteed to be non-null. However,
      * {@code flagValues.get("/flag")} is guaranteed to be null if the flag did not
      * appear in {@code args[]}, and guaranteed to be an empty list if the flag

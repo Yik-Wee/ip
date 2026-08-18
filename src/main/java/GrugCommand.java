@@ -338,13 +338,16 @@ public sealed interface GrugCommand {
      */
     public static GrugCommand from(String input) throws GrugCommandParserException {
         input = input.strip();
-        String[] args = input.split("\\s+");
 
-        // no command given, e.g. user just presses enter without inputting anything
-        if (args.length == 0) {
+        // no command given, e.g. user just presses enter without inputting anything, or
+        // inputting whitespace
+        if (input.isEmpty()) {
             return new GrugCommand.Empty();
         }
 
+        // input must have had a non-whitespace character, so splitting it must give an
+        // array with at least length 1, so args[0] will not throw
+        String[] args = input.split("\\s+");
         String commandString = args[0].toLowerCase();
 
         return switch (commandString) {

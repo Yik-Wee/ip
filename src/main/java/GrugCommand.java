@@ -95,6 +95,11 @@ public sealed interface GrugCommand {
      * @param task the task to add.
      */
     record AddTodoTask(TodoTask task) implements GrugCommand {
+        /**
+         * {@inheritDoc}
+         *
+         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
+         */
         @Override
         public void execute(List<Task> tasks) {
             tasks.add(task);
@@ -132,6 +137,11 @@ public sealed interface GrugCommand {
      * @param task The task to add.
      */
     record AddDeadlineTask(DeadlineTask task) implements GrugCommand {
+        /**
+         * {@inheritDoc}
+         *
+         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
+         */
         @Override
         public void execute(List<Task> tasks) {
             tasks.add(task);
@@ -174,6 +184,11 @@ public sealed interface GrugCommand {
      * @param task The task to add.
      */
     record AddEventTask(EventTask task) implements GrugCommand {
+        /**
+         * {@inheritDoc}
+         *
+         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
+         */
         @Override
         public void execute(List<Task> tasks) {
             tasks.add(task);
@@ -329,6 +344,58 @@ public sealed interface GrugCommand {
     }
 
     /**
+     * Command to delete a task based on the task number (1-based).
+     *
+     * @param task The task to delete.
+     */
+    record DeleteTask(int taskNum) implements GrugCommand {
+        /**
+         * {@inheritDoc}
+         *
+         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
+         */
+        @Override
+        public void execute(List<Task> tasks) {
+            int taskIdx = taskNum - 1;
+
+            // ensure index is in range so .get() does not throw
+            if (taskIdx < 0 || taskIdx >= tasks.size()) {
+                System.out.println("Can't find task number %d".formatted(taskNum));
+                return;
+            }
+
+            // this may throw an UnsupportedOperationException if the list is
+            // unmodifiable, e.g. with List.of(1, 2, 3)
+            Task removedTask = tasks.remove(taskIdx);
+
+            System.out.println("deleted: %s".formatted(removedTask));
+        }
+
+        /** TODO */
+        public static DeleteTask from(String[] args) throws GrugCommandParserException {
+            if (args.length == 0) {
+                throw new IllegalArgumentException("`args[]` must be non-empty");
+            }
+
+            // only `delete <tasknum>` is valid
+            if (args.length != 2) {
+                throw new GrugCommandParserException.InvalidUsage("delete <tasknum>");
+            }
+
+            String rhs = args[1];
+            int taskNum;
+            try {
+                taskNum = Integer.parseInt(rhs);
+            } catch (NumberFormatException e) {
+                throw new GrugCommandParserException.InvalidArgument(
+                        "delete <tasknum>",
+                        "tasknum must be an integer");
+            }
+            return new GrugCommand.DeleteTask(taskNum);
+        }
+    }
+
+    /**
      * Parses raw user input and maps it to the appropriate {@link GrugCommand}
      * variant.
      *
@@ -358,6 +425,7 @@ public sealed interface GrugCommand {
             case "todo" -> AddTodoTask.from(args);
             case "deadline" -> AddDeadlineTask.from(args);
             case "event" -> AddEventTask.from(args);
+            case "delete" -> DeleteTask.from(args);
             default -> throw new GrugCommandParserException.UnknownCommand(commandString);
         };
     }

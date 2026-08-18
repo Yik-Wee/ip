@@ -32,7 +32,7 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 After every code update:
 
-1. Review `.codex/test/ui-test-plan.md` and update it when the change adds, removes, or changes user-visible command-line behavior or test coverage.
+1. Review `test/ui-test-plan.md` and update it when the change adds, removes, or changes user-visible command-line behavior or test coverage.
 2. Invoke the project-specific `test-ui` skill and run the listed UI tests. Follow the skill's requirement to stop at the first failure and report the console transcript and any actual-versus-expected mismatch.
 
 ## Git

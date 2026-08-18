@@ -20,4 +20,14 @@ public class GrugCommandParserException extends Exception {
             super("Invalid argument(s) for `%s`: %s".formatted(command, reason));
         }
     }
+
+    /**
+     * Represents the error state when a command is used without providing required
+     * arguments
+     */
+    public static final class InvalidUsage extends GrugCommandParserException {
+        public InvalidUsage(String usage) {
+            super("Invalid usage. Proper usage: " + usage);
+        }
+    }
 }

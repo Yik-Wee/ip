@@ -1,6 +1,10 @@
 import java.util.List;
+import java.util.Set;
 
+import task.DeadlineTask;
+import task.EventTask;
 import task.Task;
+import task.TodoTask;
 
 /**
  * Algebraic Data Type that represents the user's command.
@@ -40,8 +44,7 @@ public sealed interface GrugCommand {
 
             // only `bye` is valid, with no additional args
             if (args.length > 1) {
-                throw new GrugCommandParserException.InvalidArgument(
-                        "bye", "`bye` command expects no arguments");
+                throw new GrugCommandParserException.InvalidUsage("bye (with no arguments)");
             }
             return new GrugCommand.Quit();
         }
@@ -79,8 +82,7 @@ public sealed interface GrugCommand {
 
             // only `list` is valid, with no additional args
             if (args.length > 1) {
-                throw new GrugCommandParserException.InvalidArgument(
-                        "list", "`list` command expects no arguments");
+                throw new GrugCommandParserException.InvalidUsage("list (with no arguments)");
             }
             return new GrugCommand.ListTasks();
 
@@ -88,16 +90,122 @@ public sealed interface GrugCommand {
     }
 
     /**
-     * Command to add a task to the list of tasks to do.
+     * Command to add a todo task to the list of tasks.
      *
      * @param task the task to add.
      */
-    record AddTask(Task task) implements GrugCommand {
+    record AddTodoTask(TodoTask task) implements GrugCommand {
         @Override
         public void execute(List<Task> tasks) {
             tasks.add(task);
 
             System.out.println("added: " + task);
+        }
+
+        /**
+         * Parses the argument list `args`.
+         *
+         * @param args The list of arguments read from the input, including the initial
+         *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
+         * @return A new {@link AddTodoTask} command instance
+         * @throws GrugCommandParserException If something went wrong parsing the args.
+         * @throws IllegalArgumentException   If args is empty
+         */
+        public static AddTodoTask from(String[] args) throws GrugCommandParserException {
+            if (args.length == 0) {
+                throw new IllegalArgumentException("`args[]` must be non-empty.");
+            }
+
+            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of());
+            if (parsedArgs.inputs().isEmpty()) {
+                throw new GrugCommandParserException.InvalidUsage("todo <details>");
+            }
+            String details = String.join(" ", parsedArgs.inputs());
+
+            return new AddTodoTask(new TodoTask(details.toString()));
+        }
+    }
+
+    /**
+     * Command to add a task with deadline to the list of tasks.
+     *
+     * @param task The task to add.
+     */
+    record AddDeadlineTask(DeadlineTask task) implements GrugCommand {
+        @Override
+        public void execute(List<Task> tasks) {
+            tasks.add(task);
+
+            System.out.println("added: " + task);
+        }
+
+        /**
+         * Parses the argument list `args`.
+         *
+         * @param args The list of arguments read from the input, including the initial
+         *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
+         * @return A new {@link AddDeadlineTask} command instance
+         * @throws GrugCommandParserException If something went wrong parsing the args.
+         * @throws IllegalArgumentException   If args is empty
+         */
+        public static AddDeadlineTask from(String[] args) throws GrugCommandParserException {
+            if (args.length == 0) {
+                throw new IllegalArgumentException("`args[]` must be non-empty.");
+            }
+
+            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of("/by"));
+            List<String> detailsTokens = parsedArgs.inputs();
+            List<String> deadlineTokens = parsedArgs.flagValues().get("/by");
+
+            if (detailsTokens.isEmpty() || deadlineTokens.isEmpty()) {
+                throw new GrugCommandParserException.InvalidUsage("deadline <details> /by <deadline>");
+            }
+
+            String details = String.join(" ", detailsTokens);
+            String deadline = String.join(" ", deadlineTokens);
+
+            return new AddDeadlineTask(new DeadlineTask(details.toString(), deadline.toString()));
+        }
+    }
+
+    /**
+     * Command to add an event task with a start and end date/time.
+     *
+     * @param task The task to add.
+     */
+    record AddEventTask(EventTask task) implements GrugCommand {
+        @Override
+        public void execute(List<Task> tasks) {
+            tasks.add(task);
+
+            System.out.println("added: " + task);
+
+        }
+
+        /**
+         * Parses the argument list `args`.
+         *
+         * @param args The list of arguments read from the input, including the initial
+         *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
+         * @return A new {@link AddEventTask} command instance
+         * @throws GrugCommandParserException If something went wrong parsing the args.
+         * @throws IllegalArgumentException   If args is empty
+         */
+        public static AddEventTask from(String[] args) throws GrugCommandParserException {
+            if (args.length == 0) {
+                throw new IllegalArgumentException("`args[]` must be non-empty.");
+            }
+
+            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of("/from", "/to"));
+            if (parsedArgs.inputs().isEmpty()) {
+                throw new GrugCommandParserException.InvalidUsage("event <details> /from <from> /to <to>");
+            }
+
+            String details = String.join(" ", parsedArgs.inputs());
+            String from = String.join(" ", parsedArgs.flagValues().get("/from"));
+            String to = String.join(" ", parsedArgs.flagValues().get("/to"));
+
+            return new AddEventTask(new EventTask(details, from, to));
         }
     }
 
@@ -138,9 +246,7 @@ public sealed interface GrugCommand {
 
             // only `mark <tasknum>` is valid
             if (args.length != 2) {
-                throw new GrugCommandParserException.InvalidArgument(
-                        "mark <tasknum>",
-                        "must provide exactly 1 integer tasknum");
+                throw new GrugCommandParserException.InvalidUsage("mark <tasknum>");
             }
 
             String rhs = args[1];
@@ -235,14 +341,17 @@ public sealed interface GrugCommand {
             case "list" -> ListTasks.from(args);
             case "mark" -> MarkTask.from(args);
             case "unmark" -> UnmarkTask.from(args);
-            default -> new GrugCommand.AddTask(new Task(input));
+            case "todo" -> AddTodoTask.from(args);
+            case "deadline" -> AddDeadlineTask.from(args);
+            case "event" -> AddEventTask.from(args);
+            default -> new GrugCommand.AddTodoTask(new TodoTask(input));
         };
     }
 
     /**
      * Executes the command.
      *
-     * For example, `{@link AddTask}::execute()` should add the task
+     * For example, `{@link AddTodoTask}::execute()` should add the task
      * to the list of tasks and display an appropriate message.
      */
     public abstract void execute(List<Task> tasks);

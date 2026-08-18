@@ -358,7 +358,7 @@ public sealed interface GrugCommand {
             case "todo" -> AddTodoTask.from(args);
             case "deadline" -> AddDeadlineTask.from(args);
             case "event" -> AddEventTask.from(args);
-            default -> new GrugCommand.AddTodoTask(new TodoTask(input));
+            default -> throw new GrugCommandParserException.UnknownCommand(commandString);
         };
     }
 

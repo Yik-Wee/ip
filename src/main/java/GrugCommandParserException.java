@@ -13,7 +13,7 @@ public class GrugCommandParserException extends Exception {
 
     /**
      * Represents the error state when an invalid argument is supplied to a
-     * valid command
+     * valid command.
      */
     public static final class InvalidArgument extends GrugCommandParserException {
         public InvalidArgument(String command, String reason) {
@@ -23,11 +23,20 @@ public class GrugCommandParserException extends Exception {
 
     /**
      * Represents the error state when a command is used without providing required
-     * arguments
+     * arguments.
      */
     public static final class InvalidUsage extends GrugCommandParserException {
         public InvalidUsage(String usage) {
             super("Invalid usage. Proper usage: " + usage);
+        }
+    }
+
+    /**
+     * Represents the error state when an unknown command is supplied.
+     */
+    public static final class UnknownCommand extends GrugCommandParserException {
+        public UnknownCommand(String command) {
+            super("Unknown command `%s`".formatted(command));
         }
     }
 }

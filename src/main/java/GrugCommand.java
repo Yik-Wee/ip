@@ -1,5 +1,7 @@
 import java.util.List;
 
+import task.Task;
+
 /**
  * Algebraic Data Type that represents the user's command.
  */

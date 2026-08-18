@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import task.Task;
+
 /**
  * Entrypoint of the Grug chatbot application
  */

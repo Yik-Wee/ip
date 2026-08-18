@@ -1,3 +1,5 @@
+package task;
+
 /**
  * Represents a task, storing the task `details` and whether the task has been
  * completed or not.

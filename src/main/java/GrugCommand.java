@@ -371,7 +371,15 @@ public sealed interface GrugCommand {
             System.out.println("deleted: %s".formatted(removedTask));
         }
 
-        /** TODO */
+        /**
+         * Parses the argument list `args`.
+         *
+         * @param args The list of arguments read from the input, including the initial
+         *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
+         * @return A new {@link DeleteTask} command instance
+         * @throws GrugCommandParserException if something went wrong parsing the args.
+         * @throws IllegalArgumentException   If args is empty
+         */
         public static DeleteTask from(String[] args) throws GrugCommandParserException {
             if (args.length == 0) {
                 throw new IllegalArgumentException("`args[]` must be non-empty");

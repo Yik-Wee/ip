@@ -346,7 +346,7 @@ public sealed interface GrugCommand {
     /**
      * Command to delete a task based on the task number (1-based).
      *
-     * @param task The task to delete.
+     * @param taskNum The task to delete.
      */
     record DeleteTask(int taskNum) implements GrugCommand {
         /**

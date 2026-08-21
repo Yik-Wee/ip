@@ -46,6 +46,10 @@ public abstract class Task {
         return this.details;
     }
 
+    public boolean getCompleted() {
+        return this.isCompleted;
+    }
+
     @Override
     public String toString() {
         String checkbox = this.isCompleted ? "[X]" : "[ ]";

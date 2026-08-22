@@ -1,5 +1,6 @@
 package task;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -24,6 +25,11 @@ public class DeadlineTask extends Task {
 
     public LocalDateTime getDeadlineDatetime() {
         return this.deadlineDatetime;
+    }
+
+    @Override
+    public boolean doesOccurOn(LocalDate date) {
+        return this.deadlineDatetime.toLocalDate().equals(date);
     }
 
     @Override

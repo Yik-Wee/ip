@@ -1,5 +1,6 @@
 package task;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -9,9 +10,10 @@ import java.time.temporal.ChronoField;
  * completed or not.
  */
 public abstract class Task {
-    public static final String DATE_TIME_INPUT_PATTERN = "yyyy-MM-dd[ HH[:]mm]";
+    public static final String DATE_TIME_INPUT_PATTERN = "[yyyy-]MM-dd[ HH[:]mm]";
     public static final DateTimeFormatter DATE_TIME_INPUT_FORMATTER = new DateTimeFormatterBuilder()
             .appendPattern(DATE_TIME_INPUT_PATTERN)
+            .parseDefaulting(ChronoField.YEAR, LocalDate.now().getYear())
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .toFormatter();
@@ -64,6 +66,15 @@ public abstract class Task {
     public boolean getCompleted() {
         return this.isCompleted;
     }
+
+    /**
+     * Determines whether the task falls on / coincides with the given date.
+     *
+     * @param date The target date that the task may coincide with.
+     * @return {@code true} if the task coincides with the date, {@code false}
+     *         otherwise.
+     */
+    public abstract boolean doesOccurOn(LocalDate date);
 
     @Override
     public String toString() {

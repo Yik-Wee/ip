@@ -1,5 +1,6 @@
 package task;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
@@ -31,6 +32,16 @@ public class EventTask extends Task {
 
     public LocalDateTime getEndDatetime() {
         return this.endDatetime;
+    }
+
+    @Override
+    public boolean doesOccurOn(LocalDate date) {
+        // event occurs on that datetime iff start <= datetime <= end
+        LocalDate startDate = startDatetime.toLocalDate();
+        boolean isTargetAfterEqStart = startDate.isBefore(date) || startDate.equals(date);
+        LocalDate endDate = endDatetime.toLocalDate();
+        boolean isTargetBeforeEqEnd = endDate.isAfter(date) || endDate.isEqual(date);
+        return isTargetAfterEqStart && isTargetBeforeEqEnd;
     }
 
     @Override

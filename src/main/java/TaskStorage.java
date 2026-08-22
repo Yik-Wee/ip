@@ -1,9 +1,13 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
 import task.Task;
+import task.serde.TaskDeserializer;
+import task.serde.TaskDeserializerException;
 import task.serde.TaskSerializer;
 
 /**
@@ -50,9 +54,23 @@ public final class TaskStorage {
         }
     }
 
-    /** TODO (also may fail to deserialize, thats a different exception) */
-    public List<Task> loadTasks() throws IOException {
-        // TODO
-        return null;
+    /**
+     * Loads the tasks to the file specified by the storage filepath
+     * {@link #getFilepath()}.
+     *
+     * @throws IOException               If the named file exists but is a directory
+     *                                   rather than a regular file, does not exist
+     *                                   but cannot be created, or cannot be opened
+     *                                   or written to for any other reason.
+     * @throws TaskDeserializerException If there was an error deserializing the
+     *                                   saved tasks.
+     */
+    public List<Task> loadTasks() throws IOException, TaskDeserializerException {
+        String serializedTasks;
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(this.filepath))) {
+            serializedTasks = bufferedReader.readAllAsString();
+        }
+
+        return TaskDeserializer.deserializeMany(serializedTasks);
     }
 }

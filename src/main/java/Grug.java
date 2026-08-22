@@ -1,5 +1,8 @@
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+
+import task.serde.TaskDeserializerException;
 
 /**
  * Entrypoint of the Grug chatbot application
@@ -63,6 +66,14 @@ public class Grug {
 
     public static void main(String[] args) {
         System.out.println(BANNER);
+        System.out.println("Loading tasks from %s...".formatted(storage.getFilepath()));
+        try {
+            storage.loadTasks().forEach(task -> tasks.addTask(task));
+            System.out.println("Loaded tasks from %s".formatted(storage.getFilepath()));
+        } catch (IOException | TaskDeserializerException e) {
+            System.out.println(
+                    "Failed to load tasks from %s: %s".formatted(storage.getFilepath(), e.getMessage()));
+        }
         System.out.println("Unga. Me Grug. What do? ('bye' to quit)");
         System.out.println(DIALOG_SEP);
 

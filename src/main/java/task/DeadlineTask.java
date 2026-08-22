@@ -1,27 +1,13 @@
 package task;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoField;
 
 /**
  * Represents a task that needs to be done before a specific date/time
  * e.g. _submit report by 2026-12-25 17:00.
  */
 public class DeadlineTask extends Task {
-    public static final String DATE_TIME_INPUT_PATTERN = "yyyy-MM-dd[ HH[:]mm]";
-    public static final DateTimeFormatter DATE_TIME_INPUT_FORMATTER = new DateTimeFormatterBuilder()
-            .appendPattern(DATE_TIME_INPUT_PATTERN)
-            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-            .toFormatter();
-
-    private static final String DATE_TIME_DISPLAY_PATTERN = "MMM dd yyyy HHmm";
-    private static final DateTimeFormatter DATE_TIME_DISPLAY_FORMATTER = DateTimeFormatter
-            .ofPattern(DATE_TIME_DISPLAY_PATTERN);
-
     private LocalDateTime deadlineDatetime;
 
     /**

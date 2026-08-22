@@ -1,10 +1,25 @@
 package task;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+
 /**
  * Represents a task, storing the task `details` and whether the task has been
  * completed or not.
  */
 public abstract class Task {
+    public static final String DATE_TIME_INPUT_PATTERN = "yyyy-MM-dd[ HH[:]mm]";
+    public static final DateTimeFormatter DATE_TIME_INPUT_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern(DATE_TIME_INPUT_PATTERN)
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .toFormatter();
+
+    protected static final String DATE_TIME_DISPLAY_PATTERN = "MMM dd yyyy HHmm";
+    protected static final DateTimeFormatter DATE_TIME_DISPLAY_FORMATTER = DateTimeFormatter
+            .ofPattern(DATE_TIME_DISPLAY_PATTERN);
+
     private String details;
     private boolean isCompleted;
 

@@ -95,7 +95,7 @@ public class TaskSerializer {
      * Serializes the {@link EventTask} instance into the following format:
      *
      * <pre>
-     * [deadline]
+     * [event]
      * completed = 1 // 1 for completed, 0 for not completed
      * details = details here // newlines are converted into \n
      * start = start date/time

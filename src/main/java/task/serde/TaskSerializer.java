@@ -58,7 +58,7 @@ public class TaskSerializer {
      */
     public static String serialize(TodoTask task) {
         String completed = task.getCompleted() ? "1" : "0";
-        String details = task.getDetails().replaceAll("\n", "\\n");
+        String details = task.getDetails().replace("\n", "\\n");
         return """
                 [todo]
                 completed = %s
@@ -81,7 +81,7 @@ public class TaskSerializer {
      */
     public static String serialize(DeadlineTask task) {
         String completed = task.getCompleted() ? "1" : "0";
-        String details = task.getDetails().replaceAll("\n", "\\n");
+        String details = task.getDetails().replace("\n", "\\n");
         String by = task.getDeadlineDatetime();
         return """
                 [deadline]
@@ -107,7 +107,7 @@ public class TaskSerializer {
      */
     public static String serialize(EventTask task) {
         String completed = task.getCompleted() ? "1" : "0";
-        String details = task.getDetails().replaceAll("\n", "\\n");
+        String details = task.getDetails().replace("\n", "\\n");
         String start = task.getStartDatetime();
         String end = task.getEndDatetime();
 

@@ -240,7 +240,12 @@ public sealed interface GrugCommand {
             String from = String.join(" ", parsedArgs.flagValues().get("/from"));
             String to = String.join(" ", parsedArgs.flagValues().get("/to"));
 
-            return new AddEventTask(new EventTask(details, from, to));
+            try {
+                return new AddEventTask(new EventTask(details, from, to));
+            } catch (DateTimeParseException e) {
+                throw new GrugCommandParserException(
+                        "from & to must be in the format: " + EventTask.DATE_TIME_INPUT_PATTERN);
+            }
         }
     }
 

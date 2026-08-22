@@ -231,7 +231,7 @@ public class TaskDeserializer {
             return task;
         } catch (DateTimeParseException e) {
             throw new TaskDeserializerException(
-                    "deadline.by `%s` does not match format `%s`"
+                    "[deadline] property by = `%s` does not match format `%s`"
                             .formatted(by, DeadlineTask.DATE_TIME_INPUT_PATTERN),
                     e);
         }
@@ -263,6 +263,25 @@ public class TaskDeserializer {
             throw new TaskDeserializerException("[event] task requires non-empty `end` property");
         }
 
+        try {
+            EventTask.DATE_TIME_INPUT_FORMATTER.parse(start);
+        } catch (DateTimeParseException e) {
+            throw new TaskDeserializerException(
+                    "[event] property start = `%s` does not match format `%s`"
+                            .formatted(start, EventTask.DATE_TIME_INPUT_PATTERN),
+                    e);
+        }
+
+        try {
+            EventTask.DATE_TIME_INPUT_FORMATTER.parse(end);
+        } catch (DateTimeParseException e) {
+            throw new TaskDeserializerException(
+                    "[event] property end = `%s` does not match format `%s`"
+                            .formatted(end, EventTask.DATE_TIME_INPUT_PATTERN),
+                    e);
+        }
+
+        // guaranteed not to throw now that we validated start and end
         EventTask task = new EventTask(details, start, end);
 
         // only set isCompleted to true if `completed = 1`

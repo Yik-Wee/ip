@@ -141,14 +141,14 @@ ____________________________________________________________
 2. `todo`
 3. `list`
 4. `deadline submit report /by`
-5. `deadline submit report /by Friday`
-6. `event project meeting /from 2pm`
+5. `deadline submit report /by 2026-09-25 17:30`
+6. `event project meeting /from 2026-09-24 14:00`
 7. `list`
 8. `mark abc`
 9. `mark 1`
 10. `list`
 11. `unmark 1`
-12. `event project meeting /from 2pm /to 4pm`
+12. `event project meeting /from 2026-09-24 14:00 /to 2026-09-25 16:00`
 13. `list`
 14. `bye`
 
@@ -178,14 +178,14 @@ ____________________________________________________________
 #### Command 4
 
 ```text
-Invalid usage. Proper usage: deadline <details> /by <deadline>
+Invalid usage. Proper usage: deadline <details> /by <[yyyy-]MM-dd[ HH[:]mm]>
 ____________________________________________________________
 ```
 
 #### Command 5
 
 ```text
-added: [D][ ] submit report (by: Friday)
+added: [D][ ] submit report (by: Sept 25 2026 1730)
 ____________________________________________________________
 ```
 
@@ -200,7 +200,7 @@ ____________________________________________________________
 
 ```text
 1. [T][ ] buy milk
-2. [D][ ] submit report (by: Friday)
+2. [D][ ] submit report (by: Sept 25 2026 1730)
 ____________________________________________________________
 ```
 
@@ -222,7 +222,7 @@ ____________________________________________________________
 
 ```text
 1. [T][X] buy milk
-2. [D][ ] submit report (by: Friday)
+2. [D][ ] submit report (by: Sept 25 2026 1730)
 ____________________________________________________________
 ```
 
@@ -236,7 +236,7 @@ ____________________________________________________________
 #### Command 12
 
 ```text
-added: [E][ ] project meeting (from: 2pm | to: 4pm)
+added: [E][ ] project meeting (from: Sept 24 2026 1400 | to: Sept 25 2026 1600)
 ____________________________________________________________
 ```
 
@@ -244,8 +244,8 @@ ____________________________________________________________
 
 ```text
 1. [T][ ] buy milk
-2. [D][ ] submit report (by: Friday)
-3. [E][ ] project meeting (from: 2pm | to: 4pm)
+2. [D][ ] submit report (by: Sept 25 2026 1730)
+3. [E][ ] project meeting (from: Sept 24 2026 1400 | to: Sept 25 2026 1600)
 ____________________________________________________________
 ```
 
@@ -327,6 +327,89 @@ ____________________________________________________________
 
 ```text
 1. [T][ ] read book
+____________________________________________________________
+```
+
+#### Command 9
+
+```text
+Unga. Bye. さよなら
+____________________________________________________________
+```
+
+### Find tasks on a date
+
+**Aim:** Verify that `find-on` returns deadlines on the target date, events spanning the target date, ignores an optional time, and rejects invalid or missing dates.
+
+**Inputs (commands):**
+
+1. `deadline submit report /by 2026-09-21 10:30`
+2. `event project meeting /from 2026-09-20 12:00 /to 2026-09-22 18:00`
+3. `todo read book`
+4. `find-on 2026-09-21`
+5. `find-on 2026-09-21 23:59`
+6. `find-on 2026-09-23`
+7. `find-on 2026-13-01`
+8. `find-on`
+9. `bye`
+
+**Expected output:**
+
+#### Command 1
+
+```text
+added: [D][ ] submit report (by: Sept 21 2026 1030)
+____________________________________________________________
+```
+
+#### Command 2
+
+```text
+added: [E][ ] project meeting (from: Sept 20 2026 1200 | to: Sept 22 2026 1800)
+____________________________________________________________
+```
+
+#### Command 3
+
+```text
+added: [T][ ] read book
+____________________________________________________________
+```
+
+#### Command 4
+
+```text
+1. [D][ ] submit report (by: Sept 21 2026 1030)
+2. [E][ ] project meeting (from: Sept 20 2026 1200 | to: Sept 22 2026 1800)
+____________________________________________________________
+```
+
+#### Command 5
+
+```text
+1. [D][ ] submit report (by: Sept 21 2026 1030)
+2. [E][ ] project meeting (from: Sept 20 2026 1200 | to: Sept 22 2026 1800)
+____________________________________________________________
+```
+
+#### Command 6
+
+```text
+____________________________________________________________
+```
+
+#### Command 7
+
+```text
+Invalid argument(s) for `target datetime`: must be in the format [yyyy-]MM-dd[ HH[:]mm]
+(but the time provided is ignored)
+____________________________________________________________
+```
+
+#### Command 8
+
+```text
+Invalid usage. Proper usage: find-on <[yyyy-]MM-dd[ HH[:]mm]>
 ____________________________________________________________
 ```
 

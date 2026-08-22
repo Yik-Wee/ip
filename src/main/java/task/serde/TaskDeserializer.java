@@ -1,5 +1,6 @@
 package task.serde;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -220,13 +221,20 @@ public class TaskDeserializer {
             throw new TaskDeserializerException("[deadline] task requires non-empty `by` property");
         }
 
-        DeadlineTask task = new DeadlineTask(details, by);
+        try {
+            DeadlineTask task = new DeadlineTask(details, by);
 
-        // only set isCompleted to true if `completed = 1`
-        if ("1".equals(properties.get("completed"))) {
-            task.markComplete();
+            // only set isCompleted to true if `completed = 1`
+            if ("1".equals(properties.get("completed"))) {
+                task.markComplete();
+            }
+            return task;
+        } catch (DateTimeParseException e) {
+            throw new TaskDeserializerException(
+                    "[deadline] property by = `%s` does not match format `%s`"
+                            .formatted(by, DeadlineTask.DATE_TIME_INPUT_PATTERN),
+                    e);
         }
-        return task;
     }
 
     /**
@@ -255,6 +263,25 @@ public class TaskDeserializer {
             throw new TaskDeserializerException("[event] task requires non-empty `end` property");
         }
 
+        try {
+            EventTask.DATE_TIME_INPUT_FORMATTER.parse(start);
+        } catch (DateTimeParseException e) {
+            throw new TaskDeserializerException(
+                    "[event] property start = `%s` does not match format `%s`"
+                            .formatted(start, EventTask.DATE_TIME_INPUT_PATTERN),
+                    e);
+        }
+
+        try {
+            EventTask.DATE_TIME_INPUT_FORMATTER.parse(end);
+        } catch (DateTimeParseException e) {
+            throw new TaskDeserializerException(
+                    "[event] property end = `%s` does not match format `%s`"
+                            .formatted(end, EventTask.DATE_TIME_INPUT_PATTERN),
+                    e);
+        }
+
+        // guaranteed not to throw now that we validated start and end
         EventTask task = new EventTask(details, start, end);
 
         // only set isCompleted to true if `completed = 1`

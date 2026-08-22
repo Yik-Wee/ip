@@ -1,5 +1,7 @@
 package task;
 
+import java.time.LocalDate;
+
 /**
  * Represents a Task without any date/time attached to it
  * e.g. _visit new theme park_.
@@ -13,6 +15,11 @@ public class TodoTask extends Task {
      */
     public TodoTask(String details) {
         super(details);
+    }
+
+    @Override
+    public boolean doesOccurOn(LocalDate date) {
+        return false;
     }
 
     @Override

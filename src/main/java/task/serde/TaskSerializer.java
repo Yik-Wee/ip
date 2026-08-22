@@ -82,7 +82,7 @@ public class TaskSerializer {
     public static String serialize(DeadlineTask task) {
         String completed = task.getCompleted() ? "1" : "0";
         String details = task.getDetails().replace("\n", "\\n");
-        String by = task.getDeadlineDatetime();
+        String by = task.getDeadlineDatetime().format(DeadlineTask.DATE_TIME_INPUT_FORMATTER);
         return """
                 [deadline]
                 completed = %s

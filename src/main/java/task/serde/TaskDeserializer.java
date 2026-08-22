@@ -1,5 +1,6 @@
 package task.serde;
 
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -220,13 +221,20 @@ public class TaskDeserializer {
             throw new TaskDeserializerException("[deadline] task requires non-empty `by` property");
         }
 
-        DeadlineTask task = new DeadlineTask(details, by);
+        try {
+            DeadlineTask task = new DeadlineTask(details, by);
 
-        // only set isCompleted to true if `completed = 1`
-        if ("1".equals(properties.get("completed"))) {
-            task.markComplete();
+            // only set isCompleted to true if `completed = 1`
+            if ("1".equals(properties.get("completed"))) {
+                task.markComplete();
+            }
+            return task;
+        } catch (DateTimeParseException e) {
+            throw new TaskDeserializerException(
+                    "deadline.by `%s` does not match format `%s`"
+                            .formatted(by, DeadlineTask.DATE_TIME_INPUT_PATTERN),
+                    e);
         }
-        return task;
     }
 
     /**

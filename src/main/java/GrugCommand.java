@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -171,13 +172,19 @@ public sealed interface GrugCommand {
             List<String> deadlineTokens = parsedArgs.flagValues().get("/by");
 
             if (detailsTokens.isEmpty() || deadlineTokens == null || deadlineTokens.isEmpty()) {
-                throw new GrugCommandParserException.InvalidUsage("deadline <details> /by <deadline>");
+                throw new GrugCommandParserException.InvalidUsage(
+                        "deadline <details> /by <%s>".formatted(DeadlineTask.DATE_TIME_INPUT_PATTERN));
             }
 
             String details = String.join(" ", detailsTokens);
             String deadline = String.join(" ", deadlineTokens);
 
-            return new AddDeadlineTask(new DeadlineTask(details.toString(), deadline.toString()));
+            try {
+                return new AddDeadlineTask(new DeadlineTask(details.toString(), deadline.toString()));
+            } catch (DateTimeParseException e) {
+                throw new GrugCommandParserException(
+                        "deadline must be in the format: " + DeadlineTask.DATE_TIME_INPUT_PATTERN);
+            }
         }
     }
 

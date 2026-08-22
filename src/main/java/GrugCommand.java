@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -182,8 +183,9 @@ public sealed interface GrugCommand {
             try {
                 return new AddDeadlineTask(new DeadlineTask(details.toString(), deadline.toString()));
             } catch (DateTimeParseException e) {
-                throw new GrugCommandParserException(
-                        "deadline must be in the format: " + DeadlineTask.DATE_TIME_INPUT_PATTERN);
+                throw new GrugCommandParserException.InvalidArgument(
+                        "deadline",
+                        "deadline must be in the format " + DeadlineTask.DATE_TIME_INPUT_PATTERN);
             }
         }
     }
@@ -243,8 +245,9 @@ public sealed interface GrugCommand {
             try {
                 return new AddEventTask(new EventTask(details, from, to));
             } catch (DateTimeParseException e) {
-                throw new GrugCommandParserException(
-                        "from & to must be in the format: " + EventTask.DATE_TIME_INPUT_PATTERN);
+                throw new GrugCommandParserException.InvalidArgument(
+                        "from / to",
+                        "must be in the format " + EventTask.DATE_TIME_INPUT_PATTERN);
             }
         }
     }
@@ -431,6 +434,63 @@ public sealed interface GrugCommand {
     }
 
     /**
+     * Command to list tasks that coincide with a given date.
+     */
+    record FindTasksByDate(LocalDate date) implements GrugCommand {
+        @Override
+        public void execute(TaskList tasks, TaskStorage storage) {
+            if (tasks.isEmpty()) {
+                System.out.println("No tasks added.");
+                return;
+            }
+
+            for (int i = 0; i < tasks.size(); i++) {
+                // get() here will not throw because index is in range
+                Task task = tasks.getTask(i).get();
+
+                if (task.doesOccurOn(date)) {
+                    System.out.println("%d. %s".formatted(i + 1, task));
+                }
+            }
+        }
+
+        /**
+         * Parses the argument list `args`.
+         *
+         * @param args The list of arguments read from the input, including the initial
+         *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
+         * @return A new {@link FindTasksByDate} command instance
+         * @throws GrugCommandParserException if something went wrong parsing the args.
+         * @throws IllegalArgumentException   If args is empty
+         */
+        public static FindTasksByDate from(String[] args) throws GrugCommandParserException {
+            if (args.length == 0) {
+                throw new IllegalArgumentException("`args[]` must be non-empty.");
+            }
+
+            // command without any arguments passed
+            if (args.length == 1) {
+                throw new GrugCommandParserException.InvalidUsage(
+                        "find-on <%s>".formatted(Task.DATE_TIME_INPUT_PATTERN));
+            }
+
+            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of("/from", "/to"));
+            List<String> datetimeTokens = parsedArgs.inputs();
+            String target = String.join(" ", datetimeTokens);
+
+            try {
+                LocalDate targetDateTime = LocalDate.parse(target, Task.DATE_TIME_INPUT_FORMATTER);
+                return new FindTasksByDate(targetDateTime);
+            } catch (DateTimeParseException e) {
+                throw new GrugCommandParserException.InvalidArgument(
+                        "target datetime",
+                        "must be in the format %s\n(but the time provided is ignored)"
+                                .formatted(Task.DATE_TIME_INPUT_PATTERN));
+            }
+        }
+    }
+
+    /**
      * Parses raw user input and maps it to the appropriate {@link GrugCommand}
      * variant.
      *
@@ -461,6 +521,7 @@ public sealed interface GrugCommand {
             case "deadline" -> AddDeadlineTask.from(args);
             case "event" -> AddEventTask.from(args);
             case "delete" -> DeleteTask.from(args);
+            case "find-on" -> FindTasksByDate.from(args);
             default -> throw new GrugCommandParserException.UnknownCommand(commandString);
         };
     }

@@ -1,4 +1,6 @@
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import task.DeadlineTask;
@@ -15,7 +17,7 @@ public sealed interface GrugCommand {
      */
     record Empty() implements GrugCommand {
         @Override
-        public void execute(List<Task> tasks) {
+        public void execute(TaskList tasks, TaskStorage storage) {
         }
     }
 
@@ -24,7 +26,7 @@ public sealed interface GrugCommand {
      */
     record Quit() implements GrugCommand {
         @Override
-        public void execute(List<Task> tasks) {
+        public void execute(TaskList tasks, TaskStorage storage) {
             System.out.println("Unga. Bye. さよなら");
         }
 
@@ -55,14 +57,15 @@ public sealed interface GrugCommand {
      */
     record ListTasks() implements GrugCommand {
         @Override
-        public void execute(List<Task> tasks) {
-            if (tasks.size() == 0) {
+        public void execute(TaskList tasks, TaskStorage storage) {
+            if (tasks.isEmpty()) {
                 System.out.println("No tasks added.");
                 return;
             }
 
             for (int i = 0; i < tasks.size(); i++) {
-                System.out.println("%d. %s".formatted(i + 1, tasks.get(i)));
+                // Optional::get() here will not throw since our index is always in range
+                System.out.println("%d. %s".formatted(i + 1, tasks.getTask(i).get()));
             }
         }
 
@@ -95,16 +98,16 @@ public sealed interface GrugCommand {
      * @param task the task to add.
      */
     record AddTodoTask(TodoTask task) implements GrugCommand {
-        /**
-         * {@inheritDoc}
-         *
-         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
-         */
         @Override
-        public void execute(List<Task> tasks) {
-            tasks.add(task);
-
+        public void execute(TaskList tasks, TaskStorage storage) {
+            tasks.addTask(task);
             System.out.println("added: " + task);
+
+            try {
+                storage.saveTasks(tasks.getTasks());
+            } catch (IOException e) {
+                System.out.println("Failed to save tasks to " + storage.getFilepath());
+            }
         }
 
         /**
@@ -137,16 +140,16 @@ public sealed interface GrugCommand {
      * @param task The task to add.
      */
     record AddDeadlineTask(DeadlineTask task) implements GrugCommand {
-        /**
-         * {@inheritDoc}
-         *
-         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
-         */
         @Override
-        public void execute(List<Task> tasks) {
-            tasks.add(task);
-
+        public void execute(TaskList tasks, TaskStorage storage) {
+            tasks.addTask(task);
             System.out.println("added: " + task);
+
+            try {
+                storage.saveTasks(tasks.getTasks());
+            } catch (IOException e) {
+                System.out.println("Failed to save tasks to " + storage.getFilepath());
+            }
         }
 
         /**
@@ -184,17 +187,16 @@ public sealed interface GrugCommand {
      * @param task The task to add.
      */
     record AddEventTask(EventTask task) implements GrugCommand {
-        /**
-         * {@inheritDoc}
-         *
-         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
-         */
         @Override
-        public void execute(List<Task> tasks) {
-            tasks.add(task);
-
+        public void execute(TaskList tasks, TaskStorage storage) {
+            tasks.addTask(task);
             System.out.println("added: " + task);
 
+            try {
+                storage.saveTasks(tasks.getTasks());
+            } catch (IOException e) {
+                System.out.println("Failed to save tasks to " + storage.getFilepath());
+            }
         }
 
         /**
@@ -242,18 +244,25 @@ public sealed interface GrugCommand {
      */
     record MarkTask(int taskNum) implements GrugCommand {
         @Override
-        public void execute(List<Task> tasks) {
+        public void execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
 
-            // ensure index is in range so .get() does not throw
-            if (taskIdx < 0 || taskIdx >= tasks.size()) {
+            // empty optional if index out of bounds
+            Optional<Task> optionalTask = tasks.getTask(taskIdx);
+            if (optionalTask.isEmpty()) {
                 System.out.println("Can't find task number %d".formatted(taskNum));
                 return;
             }
 
-            Task task = tasks.get(taskIdx);
+            Task task = optionalTask.get();
             task.markComplete();
             System.out.println("Updated task %d: %s".formatted(taskNum, task));
+
+            try {
+                storage.saveTasks(tasks.getTasks());
+            } catch (IOException e) {
+                System.out.println("Failed to save tasks to " + storage.getFilepath());
+            }
         }
 
         /**
@@ -295,18 +304,25 @@ public sealed interface GrugCommand {
      */
     record UnmarkTask(int taskNum) implements GrugCommand {
         @Override
-        public void execute(List<Task> tasks) {
+        public void execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
 
-            // ensure index is in range so .get() does not throw
-            if (taskIdx < 0 || taskIdx >= tasks.size()) {
+            // empty optional if index out of bounds
+            Optional<Task> optionalTask = tasks.getTask(taskIdx);
+            if (optionalTask.isEmpty()) {
                 System.out.println("Can't find task number %d".formatted(taskNum));
                 return;
             }
 
-            Task task = tasks.get(taskIdx);
+            Task task = optionalTask.get();
             task.markIncomplete();
             System.out.println("Updated task %d: %s".formatted(taskNum, task));
+
+            try {
+                storage.saveTasks(tasks.getTasks());
+            } catch (IOException e) {
+                System.out.println("Failed to save tasks to " + storage.getFilepath());
+            }
         }
 
         /**
@@ -349,26 +365,25 @@ public sealed interface GrugCommand {
      * @param taskNum The task to delete.
      */
     record DeleteTask(int taskNum) implements GrugCommand {
-        /**
-         * {@inheritDoc}
-         *
-         * @throws UnsupportedOperationException If the List passed in is unmodifiable.
-         */
         @Override
-        public void execute(List<Task> tasks) {
+        public void execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
 
-            // ensure index is in range so .get() does not throw
-            if (taskIdx < 0 || taskIdx >= tasks.size()) {
+            // empty optional if index out of bounds
+            Optional<Task> optionalRemoved = tasks.removeTask(taskIdx);
+            if (optionalRemoved.isEmpty()) {
                 System.out.println("Can't find task number %d".formatted(taskNum));
                 return;
             }
 
-            // this may throw an UnsupportedOperationException if the list is
-            // unmodifiable, e.g. with List.of(1, 2, 3)
-            Task removedTask = tasks.remove(taskIdx);
-
+            Task removedTask = optionalRemoved.get();
             System.out.println("deleted: %s".formatted(removedTask));
+
+            try {
+                storage.saveTasks(tasks.getTasks());
+            } catch (IOException e) {
+                System.out.println("Failed to save tasks to " + storage.getFilepath());
+            }
         }
 
         /**
@@ -439,10 +454,14 @@ public sealed interface GrugCommand {
     }
 
     /**
-     * Executes the command.
-     *
+     * Executes the command, modifying the {@link TaskList} or using the
+     * {@link TaskStorage} if necessary.
+     * <p>
      * For example, `{@link AddTodoTask}::execute()` should add the task
      * to the list of tasks and display an appropriate message.
+     *
+     * @param tasks   The task list that the command may modify.
+     * @param storage The task storage that the command may need to save data.
      */
-    public abstract void execute(List<Task> tasks);
+    public abstract void execute(TaskList tasks, TaskStorage storage);
 }

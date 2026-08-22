@@ -25,3 +25,5 @@ text-ui-test/EXPECTED-UNIX.TXT
 
 # codex config
 .codex/
+
+/tasks.txt

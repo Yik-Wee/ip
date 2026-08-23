@@ -47,13 +47,6 @@ public class TaskDeserializer {
         List<String> serializedTaskBlocks = new ArrayList<>();
         StringBuilder currentBlock = new StringBuilder();
 
-        // very first non-blank line must be a header, not a property
-        boolean isAlreadyMalformed = !isLineHeader(lines.get(0));
-        if (isAlreadyMalformed) {
-            throw new TaskDeserializerException(
-                    "Serialized tasks data is malformed. Task must start with a [task-type] header.");
-        }
-
         for (String line : lines) {
             // note that a malformed line header like aaa[task-type]a is NOT counted as a
             // header, but a property instead (as part of the current task block)

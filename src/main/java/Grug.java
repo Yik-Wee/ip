@@ -85,7 +85,7 @@ public class Grug {
     private void greet() {
         ui.display(BANNER);
         ui.display("Unga. Me Grug. What do? ('bye' to quit)");
-        ui.displaySeperator();
+        ui.displaySeparator();
     }
 
     /**

@@ -69,9 +69,9 @@ public class Ui {
     }
 
     /**
-     * Displays the {@link #DIALOG_SEP} seperator, then a newline.
+     * Displays the {@link #DIALOG_SEP} separator, then a newline.
      */
-    public void displaySeperator() {
+    public void displaySeparator() {
         this.writer.println(DIALOG_SEP);
         this.writer.flush();
     }
@@ -114,7 +114,7 @@ public class Ui {
 
             String input = inputOrEof.get();
             isDone = inputHandlerCallback.apply(input);
-            this.displaySeperator();
+            this.displaySeparator();
         }
     }
 }

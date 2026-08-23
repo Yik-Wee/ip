@@ -19,6 +19,14 @@ public sealed interface GrugCommand {
      * Represents no command given.
      */
     record Empty() implements GrugCommand {
+        /**
+         * Does nothing.
+         *
+         * @param tasks   The task list that is never used. Can be {@code null}.
+         * @param storage The task storage that is never used. Can be {@code null}
+         * @return A {@link CommandResult.Ok} result containing an empty {@code message}
+         *         and {@code shouldExit: false}
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             return new CommandResult.Ok("", false);
@@ -29,6 +37,14 @@ public sealed interface GrugCommand {
      * Command to quit the program.
      */
     record Quit() implements GrugCommand {
+        /**
+         * Does nothing.
+         *
+         * @param tasks   The task list that is never used. Can be {@code null}.
+         * @param storage The task storage that is never used. Can be {@code null}
+         * @return A {@link CommandResult.Ok} result containing the quit {@code message}
+         *         and {@code shouldExit: false}
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             return new CommandResult.Ok("Unga. Bye. さよなら", true);
@@ -39,6 +55,15 @@ public sealed interface GrugCommand {
      * Command to list all tasks.
      */
     record ListTasks() implements GrugCommand {
+        /**
+         * Lists all tasks in the tasks list.
+         *
+         * @param tasks   The task list to read from.
+         * @param storage The task storage that is never used. Can be {@code null}
+         * @return A {@link CommandResult.Ok} result containing the list of tasks
+         *         seperated by newlines in {@code message} (or an appropriate message
+         *         if task list is empty) and {@code shouldExit: false}.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             if (tasks.isEmpty()) {
@@ -60,6 +85,19 @@ public sealed interface GrugCommand {
      * @param task the task to add.
      */
     record AddTodoTask(TodoTask task) implements GrugCommand {
+        /**
+         * Adds a new {@link TodoTask} to the tasks list, then attempts to save the save
+         * the list to disk.
+         *
+         * @param tasks   The task list to add to.
+         * @param storage The task storage to save to.
+         * @return A {@link CommandResult.Ok} whose {@code message} contains the new
+         *         task added and {@code shouldExit: false} if successfully saved to the
+         *         {@code storage}.
+         *         Otherwise, a {@link CommandResult.Partial} whose {@code message} is
+         *         the task added and the storage failure message and
+         *         {@code shouldExit: false}.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
@@ -83,6 +121,19 @@ public sealed interface GrugCommand {
      * @param task The task to add.
      */
     record AddDeadlineTask(DeadlineTask task) implements GrugCommand {
+        /**
+         * Adds a new {@link DeadlineTask} to the tasks list, then attempts to save the
+         * save the list to disk.
+         *
+         * @param tasks   The task list to add to.
+         * @param storage The task storage to save to.
+         * @return A {@link CommandResult.Ok} whose {@code message} contains the new
+         *         task added and {@code shouldExit: false} if successfully saved to the
+         *         {@code storage}.
+         *         Otherwise, a {@link CommandResult.Partial} whose {@code message} is
+         *         the task added and the storage failure message and
+         *         {@code shouldExit: false}.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
@@ -106,6 +157,19 @@ public sealed interface GrugCommand {
      * @param task The task to add.
      */
     record AddEventTask(EventTask task) implements GrugCommand {
+        /**
+         * Adds a new {@link EventTask} to the tasks list, then attempts to save the
+         * save the list to disk.
+         *
+         * @param tasks   The task list to add to.
+         * @param storage The task storage to save to.
+         * @return A {@link CommandResult.Ok} whose {@code message} contains the new
+         *         task added and {@code shouldExit: false} if successfully saved to the
+         *         {@code storage}.
+         *         Otherwise, a {@link CommandResult.Partial} whose {@code message} is
+         *         the task added and the storage failure message and
+         *         {@code shouldExit: false}.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
@@ -129,6 +193,22 @@ public sealed interface GrugCommand {
      * @param taskNum The 1-based task number.
      */
     record MarkTask(int taskNum) implements GrugCommand {
+        /**
+         * Marks the {@link #taskNum()}-th task (1-based) as complete, then attempts to
+         * save the list to disk.
+         *
+         * @param tasks   The task list to modify.
+         * @param storage The task storage to save to.
+         * @return A {@link CommandResult.Err} if index is out of range, with
+         *         appropriate error {@message} and {@code shouldExit: false}.
+         *
+         *         Else, a {@link CommandResult.Partial} if tasks failed to be
+         *         saved to the {@code storage}, with {@code message} containing the
+         *         updated task and the appropriate error message, and
+         *         {@code shouldExit: false}.
+         *
+         *         Else, A {@link CommandResult.Ok} if both operations successful.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
@@ -161,6 +241,22 @@ public sealed interface GrugCommand {
      * @param taskNum The 1-based task number.
      */
     record UnmarkTask(int taskNum) implements GrugCommand {
+        /**
+         * Unmarks the {@link #taskNum()}-th task (1-based) as incomplete, then attempts
+         * to save the list to disk.
+         *
+         * @param tasks   The task list to modify.
+         * @param storage The task storage to save to.
+         * @return A {@link CommandResult.Err} if index is out of range, with
+         *         appropriate error {@message} and {@code shouldExit: false}.
+         *
+         *         Else, a {@link CommandResult.Partial} if tasks failed to be
+         *         saved to the {@code storage}, with {@code message} containing the
+         *         updated task and the appropriate error message, and
+         *         {@code shouldExit: false}.
+         *
+         *         Else, A {@link CommandResult.Ok} if both operations successful.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
@@ -193,6 +289,19 @@ public sealed interface GrugCommand {
      * @param taskNum The task to delete.
      */
     record DeleteTask(int taskNum) implements GrugCommand {
+        /**
+         * Deletes the {@link #taskNum()}-th task (1-based) from the task list, then
+         * attempts to save the list to disk.
+         *
+         * @param tasks   The task list to delete the task from.
+         * @param storage The task storage to save to.
+         * @return A {@link CommandResult.Ok} whose {@code message} contains the deleted
+         *         task and {@code shouldExit: false} if successfully saved to the
+         *         {@code storage}.
+         *         Otherwise, a {@link CommandResult.Partial} whose {@code message} is
+         *         the deleted task and the storage failure message and
+         *         {@code shouldExit: false}.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
@@ -222,6 +331,18 @@ public sealed interface GrugCommand {
      * Command to list tasks that coincide with a given date.
      */
     record FindTasksByDate(LocalDate date) implements GrugCommand {
+        /**
+         * Lists all tasks in the tasks list that coincide with the target
+         * {@link #date()}.
+         *
+         * @param tasks   The task list to read from.
+         * @param storage The task storage that is never used. Can be {@code null}
+         * @return A {@link CommandResult.Ok} result containing the list of tasks
+         *         coinciding the the {@link #date()} seperated by newlines in
+         *         {@code message} (or an appropriate message
+         *         if task list is empty or no tasks coincide with the {@link #date()})
+         *         and {@code shouldExit: false}.
+         */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             if (tasks.isEmpty()) {
@@ -237,6 +358,10 @@ public sealed interface GrugCommand {
                 if (task.doesOccurOn(date)) {
                     msg.append("%d. %s\n".formatted(i + 1, task));
                 }
+            }
+
+            if (msg.isEmpty()) {
+                return new CommandResult.Ok("No tasks occuring on that date", false);
             }
 
             return new CommandResult.Ok(msg.toString().stripTrailing(), false);

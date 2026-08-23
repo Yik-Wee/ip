@@ -9,6 +9,11 @@ package grug.command;
  * exception is very likely to occur.
  */
 public class GrugCommandParserException extends Exception {
+    /**
+     * Creates a new GrugCommandParserException with the supplied {@code msg}.
+     *
+     * @param msg The perser error message.
+     */
     public GrugCommandParserException(String msg) {
         super(msg);
     }

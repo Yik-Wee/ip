@@ -30,6 +30,7 @@ public class Ui {
      */
     public void display(String message) {
         this.writer.println(message);
+        this.writer.flush();
     }
 
     /**
@@ -40,6 +41,7 @@ public class Ui {
      */
     public void display(String fmtString, Object... args) {
         this.writer.println(fmtString.formatted(args));
+        this.writer.flush();
     }
 
     /**
@@ -47,6 +49,7 @@ public class Ui {
      */
     public void displaySeperator() {
         this.writer.println(DIALOG_SEP);
+        this.writer.flush();
     }
 
     /**
@@ -58,8 +61,8 @@ public class Ui {
      * @throws IllegalStateException If the reader was closed.
      */
     public Optional<String> readInput(String prompt) {
-        writer.print(prompt);
-        writer.flush();
+        this.writer.print(prompt);
+        this.writer.flush();
 
         try {
             return Optional.of(this.reader.nextLine().strip());

@@ -1,4 +1,4 @@
-package task.serde;
+package grug.storage.serde;
 
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import task.DeadlineTask;
-import task.EventTask;
-import task.Task;
-import task.TodoTask;
+import grug.task.DeadlineTask;
+import grug.task.EventTask;
+import grug.task.Task;
+import grug.task.TodoTask;
 
 /**
  * Contains static methods to deserialize tasks that were serialized and saved

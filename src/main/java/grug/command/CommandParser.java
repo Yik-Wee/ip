@@ -1,3 +1,5 @@
+package grug.command;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -6,10 +8,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import task.DeadlineTask;
-import task.EventTask;
-import task.Task;
-import task.TodoTask;
+import grug.command.GrugCommand.AddDeadlineTask;
+import grug.command.GrugCommand.AddEventTask;
+import grug.command.GrugCommand.AddTodoTask;
+import grug.command.GrugCommand.DeleteTask;
+import grug.command.GrugCommand.FindTasksByDate;
+import grug.command.GrugCommand.ListTasks;
+import grug.command.GrugCommand.MarkTask;
+import grug.command.GrugCommand.Quit;
+import grug.command.GrugCommand.UnmarkTask;
+import grug.task.DeadlineTask;
+import grug.task.EventTask;
+import grug.task.Task;
+import grug.task.TodoTask;
 
 /**
  * Parser to parse the list of args given to Grug into the appropriate

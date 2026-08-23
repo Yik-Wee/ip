@@ -1,8 +1,8 @@
+package grug.task;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import task.Task;
 
 /**
  * Represents the program's task list, with add and remove operations.

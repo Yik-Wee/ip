@@ -48,13 +48,22 @@ public class Grug {
             return false;
         }
 
-        command.execute(tasks, storage);
+        CommandResult res = command.execute(tasks, storage);
 
-        boolean shouldExit = switch (command) {
-            case GrugCommand.Quit() -> true;
-            default -> false;
-        };
-        return shouldExit;
+        switch (res) {
+            case CommandResult.Ok(String message, boolean shouldExit) -> {
+                ui.display(message);
+                return shouldExit;
+            }
+            case CommandResult.Err(String message, boolean shouldExit) -> {
+                ui.displayError(message);
+                return shouldExit;
+            }
+            case CommandResult.Partial(String message, boolean shouldExit) -> {
+                ui.displayWarning(message);
+                return shouldExit;
+            }
+        }
     }
 
     /**

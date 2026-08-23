@@ -45,6 +45,30 @@ public class Ui {
     }
 
     /**
+     * Displays the message in red.
+     *
+     * @param message The messgae to display.
+     */
+    public void displayError(String message) {
+        this.writer.print("\033[31m");
+        this.writer.println(message);
+        this.writer.print("\033[0m");
+        this.writer.flush();
+    }
+
+    /**
+     * Displays the message in yellow.
+     *
+     * @param message The messgae to display.
+     */
+    public void displayWarning(String message) {
+        this.writer.print("\033[33m");
+        this.writer.println(message);
+        this.writer.print("\033[0m");
+        this.writer.flush();
+    }
+
+    /**
      * Displays the {@link #DIALOG_SEP} seperator, then a newline.
      */
     public void displaySeperator() {

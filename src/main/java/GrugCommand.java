@@ -19,7 +19,8 @@ public sealed interface GrugCommand {
      */
     record Empty() implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
+            return new CommandResult.Ok("", false);
         }
     }
 
@@ -28,8 +29,8 @@ public sealed interface GrugCommand {
      */
     record Quit() implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
-            System.out.println("Unga. Bye. さよなら");
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
+            return new CommandResult.Ok("Unga. Bye. さよなら", true);
         }
 
         /**
@@ -59,16 +60,17 @@ public sealed interface GrugCommand {
      */
     record ListTasks() implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             if (tasks.isEmpty()) {
-                System.out.println("No tasks added.");
-                return;
+                return new CommandResult.Ok("No tasks added.", false);
             }
 
+            StringBuilder msg = new StringBuilder();
             for (int i = 0; i < tasks.size(); i++) {
                 // Optional::get() here will not throw since our index is always in range
-                System.out.println("%d. %s".formatted(i + 1, tasks.getTask(i).get()));
+                msg.append("%d. %s\n".formatted(i + 1, tasks.getTask(i).get()));
             }
+            return new CommandResult.Ok(msg.toString().stripTrailing(), false);
         }
 
         /**
@@ -101,14 +103,18 @@ public sealed interface GrugCommand {
      */
     record AddTodoTask(TodoTask task) implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
-            System.out.println("added: " + task);
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("added: ").append(task);
 
             try {
                 storage.saveTasks(tasks.getTasks());
+                return new CommandResult.Ok(msg.toString(), false);
             } catch (IOException e) {
-                System.out.println("Failed to save tasks to " + storage.getFilepath());
+                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
+                return new CommandResult.Partial(msg.toString(), false);
             }
         }
 
@@ -143,14 +149,18 @@ public sealed interface GrugCommand {
      */
     record AddDeadlineTask(DeadlineTask task) implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
-            System.out.println("added: " + task);
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("added: ").append(task);
 
             try {
                 storage.saveTasks(tasks.getTasks());
+                return new CommandResult.Ok(msg.toString(), false);
             } catch (IOException e) {
-                System.out.println("Failed to save tasks to " + storage.getFilepath());
+                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
+                return new CommandResult.Partial(msg.toString(), false);
             }
         }
 
@@ -197,14 +207,18 @@ public sealed interface GrugCommand {
      */
     record AddEventTask(EventTask task) implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
-            System.out.println("added: " + task);
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("added: ").append(task);
 
             try {
                 storage.saveTasks(tasks.getTasks());
+                return new CommandResult.Ok(msg.toString(), false);
             } catch (IOException e) {
-                System.out.println("Failed to save tasks to " + storage.getFilepath());
+                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
+                return new CommandResult.Partial(msg.toString(), false);
             }
         }
 
@@ -259,24 +273,27 @@ public sealed interface GrugCommand {
      */
     record MarkTask(int taskNum) implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
 
             // empty optional if index out of bounds
             Optional<Task> optionalTask = tasks.getTask(taskIdx);
             if (optionalTask.isEmpty()) {
-                System.out.println("Can't find task number %d".formatted(taskNum));
-                return;
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
             }
 
             Task task = optionalTask.get();
             task.markComplete();
-            System.out.println("Updated task %d: %s".formatted(taskNum, task));
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("Updated task %d: %s".formatted(taskNum, task));
 
             try {
                 storage.saveTasks(tasks.getTasks());
+                return new CommandResult.Ok(msg.toString(), false);
             } catch (IOException e) {
-                System.out.println("Failed to save tasks to " + storage.getFilepath());
+                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
+                return new CommandResult.Partial(msg.toString(), false);
             }
         }
 
@@ -319,24 +336,27 @@ public sealed interface GrugCommand {
      */
     record UnmarkTask(int taskNum) implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
 
             // empty optional if index out of bounds
             Optional<Task> optionalTask = tasks.getTask(taskIdx);
             if (optionalTask.isEmpty()) {
-                System.out.println("Can't find task number %d".formatted(taskNum));
-                return;
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
             }
 
             Task task = optionalTask.get();
             task.markIncomplete();
-            System.out.println("Updated task %d: %s".formatted(taskNum, task));
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("Updated task %d: %s".formatted(taskNum, task));
 
             try {
                 storage.saveTasks(tasks.getTasks());
+                return new CommandResult.Ok(msg.toString(), false);
             } catch (IOException e) {
-                System.out.println("Failed to save tasks to " + storage.getFilepath());
+                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
+                return new CommandResult.Partial(msg.toString(), false);
             }
         }
 
@@ -381,23 +401,26 @@ public sealed interface GrugCommand {
      */
     record DeleteTask(int taskNum) implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             int taskIdx = taskNum - 1;
 
             // empty optional if index out of bounds
             Optional<Task> optionalRemoved = tasks.removeTask(taskIdx);
             if (optionalRemoved.isEmpty()) {
-                System.out.println("Can't find task number %d".formatted(taskNum));
-                return;
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
             }
 
             Task removedTask = optionalRemoved.get();
-            System.out.println("deleted: %s".formatted(removedTask));
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("deleted: %s".formatted(removedTask));
 
             try {
                 storage.saveTasks(tasks.getTasks());
+                return new CommandResult.Ok(msg.toString(), false);
             } catch (IOException e) {
-                System.out.println("Failed to save tasks to " + storage.getFilepath());
+                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
+                return new CommandResult.Partial(msg.toString(), false);
             }
         }
 
@@ -438,20 +461,23 @@ public sealed interface GrugCommand {
      */
     record FindTasksByDate(LocalDate date) implements GrugCommand {
         @Override
-        public void execute(TaskList tasks, TaskStorage storage) {
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
             if (tasks.isEmpty()) {
-                System.out.println("No tasks added.");
-                return;
+                return new CommandResult.Ok("No tasks added.", false);
             }
+
+            StringBuilder msg = new StringBuilder();
 
             for (int i = 0; i < tasks.size(); i++) {
                 // get() here will not throw because index is in range
                 Task task = tasks.getTask(i).get();
 
                 if (task.doesOccurOn(date)) {
-                    System.out.println("%d. %s".formatted(i + 1, task));
+                    msg.append("%d. %s\n".formatted(i + 1, task));
                 }
             }
+
+            return new CommandResult.Ok(msg.toString().stripTrailing(), false);
         }
 
         /**
@@ -536,5 +562,5 @@ public sealed interface GrugCommand {
      * @param tasks   The task list that the command may modify.
      * @param storage The task storage that the command may need to save data.
      */
-    public abstract void execute(TaskList tasks, TaskStorage storage);
+    public abstract CommandResult execute(TaskList tasks, TaskStorage storage);
 }

@@ -1,3 +1,5 @@
+package grug;
+
 import java.io.PrintWriter;
 import java.util.NoSuchElementException;
 import java.util.Optional;

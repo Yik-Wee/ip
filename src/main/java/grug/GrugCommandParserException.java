@@ -1,3 +1,5 @@
+package grug;
+
 /**
  * The base class for the (checked) exceptions thrown when there was an error
  * parsing the user input as a {@link GrugCommand}.

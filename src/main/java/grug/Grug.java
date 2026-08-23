@@ -1,8 +1,10 @@
+package grug;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-import task.serde.TaskDeserializerException;
+import grug.task.serde.TaskDeserializerException;
 
 /**
  * Entrypoint of the Grug chatbot application

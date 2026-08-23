@@ -1,11 +1,13 @@
+package grug;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import task.DeadlineTask;
-import task.EventTask;
-import task.Task;
-import task.TodoTask;
+import grug.task.DeadlineTask;
+import grug.task.EventTask;
+import grug.task.Task;
+import grug.task.TodoTask;
 
 /**
  * Algebraic Data Type that represents the user's command.

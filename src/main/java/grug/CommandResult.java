@@ -1,3 +1,5 @@
+package grug;
+
 /**
  * Represents the result of executing a command.
  */

@@ -1,9 +1,9 @@
-package task.serde;
+package grug.task.serde;
 
-import task.DeadlineTask;
-import task.EventTask;
-import task.Task;
-import task.TodoTask;
+import grug.task.DeadlineTask;
+import grug.task.EventTask;
+import grug.task.Task;
+import grug.task.TodoTask;
 
 /**
  * Contains static methods to serialize tasks into a human-readable format that

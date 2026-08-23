@@ -1,4 +1,4 @@
-package task.serde;
+package grug.task.serde;
 
 /**
  * Represents the checked exception thrown when a serialized task cannot be

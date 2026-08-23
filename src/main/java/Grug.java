@@ -42,7 +42,7 @@ public class Grug {
     private boolean handleUserInput(String input) {
         GrugCommand command;
         try {
-            command = GrugCommand.from(input);
+            command = CommandParser.parseInput(input);
         } catch (GrugCommandParserException e) {
             ui.display(e.getMessage());
             return false;

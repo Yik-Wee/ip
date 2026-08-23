@@ -1,4 +1,4 @@
-package grug;
+package grug.command;
 
 /**
  * The base class for the (checked) exceptions thrown when there was an error

@@ -1,4 +1,4 @@
-package grug;
+package grug.command;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -8,15 +8,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import grug.GrugCommand.AddDeadlineTask;
-import grug.GrugCommand.AddEventTask;
-import grug.GrugCommand.AddTodoTask;
-import grug.GrugCommand.DeleteTask;
-import grug.GrugCommand.FindTasksByDate;
-import grug.GrugCommand.ListTasks;
-import grug.GrugCommand.MarkTask;
-import grug.GrugCommand.Quit;
-import grug.GrugCommand.UnmarkTask;
+import grug.command.GrugCommand.AddDeadlineTask;
+import grug.command.GrugCommand.AddEventTask;
+import grug.command.GrugCommand.AddTodoTask;
+import grug.command.GrugCommand.DeleteTask;
+import grug.command.GrugCommand.FindTasksByDate;
+import grug.command.GrugCommand.ListTasks;
+import grug.command.GrugCommand.MarkTask;
+import grug.command.GrugCommand.Quit;
+import grug.command.GrugCommand.UnmarkTask;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.Task;

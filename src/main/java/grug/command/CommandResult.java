@@ -1,4 +1,4 @@
-package grug;
+package grug.command;
 
 /**
  * Represents the result of executing a command.

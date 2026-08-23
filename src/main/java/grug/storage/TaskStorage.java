@@ -1,4 +1,4 @@
-package grug;
+package grug.storage;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -7,10 +7,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import grug.storage.serde.TaskDeserializer;
+import grug.storage.serde.TaskDeserializerException;
+import grug.storage.serde.TaskSerializer;
 import grug.task.Task;
-import grug.task.serde.TaskDeserializer;
-import grug.task.serde.TaskDeserializerException;
-import grug.task.serde.TaskSerializer;
 
 /**
  * Utility class used to read tasks from and write tasks to a single file.

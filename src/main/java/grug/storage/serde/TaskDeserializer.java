@@ -1,4 +1,4 @@
-package grug.task.serde;
+package grug.storage.serde;
 
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;

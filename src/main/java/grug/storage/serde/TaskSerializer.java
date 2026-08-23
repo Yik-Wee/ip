@@ -1,4 +1,4 @@
-package grug.task.serde;
+package grug.storage.serde;
 
 import grug.task.DeadlineTask;
 import grug.task.EventTask;

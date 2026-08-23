@@ -18,6 +18,17 @@ public class TaskList {
     }
 
     /**
+     * Creates a new task list from a shallow copy of the tasks provided.
+     *
+     * @param tasks The initial task list to copy.
+     */
+    public TaskList(List<Task> tasks) {
+        // copy into array list so this.tasks is modifiable even if tasks is not
+        // also creates shallow copy so we don't accidentally modify another reference
+        this.tasks = new ArrayList<>(tasks);
+    }
+
+    /**
      * @return The <b>unmodifiable</b> task list
      */
     public List<Task> getTasks() {

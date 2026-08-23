@@ -132,7 +132,7 @@ public sealed interface GrugCommand {
                 throw new IllegalArgumentException("`args[]` must be non-empty.");
             }
 
-            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of());
+            CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of());
             if (parsedArgs.inputs().isEmpty()) {
                 throw new GrugCommandParserException.InvalidUsage("todo <details>");
             }
@@ -178,7 +178,7 @@ public sealed interface GrugCommand {
                 throw new IllegalArgumentException("`args[]` must be non-empty.");
             }
 
-            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of("/by"));
+            CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of("/by"));
             List<String> detailsTokens = parsedArgs.inputs();
             List<String> deadlineTokens = parsedArgs.flagValues().get("/by");
 
@@ -236,7 +236,7 @@ public sealed interface GrugCommand {
                 throw new IllegalArgumentException("`args[]` must be non-empty.");
             }
 
-            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of("/from", "/to"));
+            CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of("/from", "/to"));
             List<String> detailsTokens = parsedArgs.inputs();
             // these can be null or empty
             List<String> fromTokens = parsedArgs.flagValues().get("/from");
@@ -500,7 +500,7 @@ public sealed interface GrugCommand {
                         "find-on <%s>".formatted(Task.DATE_TIME_INPUT_PATTERN));
             }
 
-            ArgParser.ParsedArgs parsedArgs = ArgParser.parseArgs(args, Set.of("/from", "/to"));
+            CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of("/from", "/to"));
             List<String> datetimeTokens = parsedArgs.inputs();
             String target = String.join(" ", datetimeTokens);
 

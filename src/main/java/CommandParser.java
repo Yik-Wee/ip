@@ -7,7 +7,7 @@ import java.util.List;
  * Parser to parse the list of args given to Grug into the command, inputs and
  * flags
  */
-public class ArgParser {
+public class CommandParser {
     /**
      * Immutable record to hold the result of the parsing.
      *

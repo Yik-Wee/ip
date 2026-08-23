@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import grug.TaskList;
-import grug.TaskStorage;
+import grug.storage.TaskStorage;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.Task;
+import grug.task.TaskList;
 import grug.task.TodoTask;
 
 /**

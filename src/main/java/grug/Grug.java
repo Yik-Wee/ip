@@ -4,7 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-import grug.task.serde.TaskDeserializerException;
+import grug.command.CommandParser;
+import grug.command.CommandResult;
+import grug.command.GrugCommand;
+import grug.command.GrugCommandParserException;
+import grug.storage.TaskStorage;
+import grug.storage.serde.TaskDeserializerException;
+import grug.task.TaskList;
+import grug.ui.Ui;
 
 /**
  * Entrypoint of the Grug chatbot application

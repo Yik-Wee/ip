@@ -72,7 +72,7 @@ public class Grug {
     private void loadTasks() {
         ui.display("Loading tasks from %s...", storage.getFilepath());
         try {
-            storage.loadTasks().forEach(task -> tasks.addTask(task));
+            this.tasks = new TaskList(storage.loadTasks());
             ui.display("Loaded tasks from %s", storage.getFilepath());
         } catch (IOException | TaskDeserializerException e) {
             ui.display("Failed to load tasks from %s: %s", storage.getFilepath(), e.getMessage());

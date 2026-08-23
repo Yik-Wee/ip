@@ -1,5 +1,5 @@
 import java.io.IOException;
-import java.util.NoSuchElementException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 import task.serde.TaskDeserializerException;
@@ -8,7 +8,6 @@ import task.serde.TaskDeserializerException;
  * Entrypoint of the Grug chatbot application
  */
 public class Grug {
-    private static final String DIALOG_SEP = "____________________________________________________________";
     private static final String BANNER = """
             ▄████  ██▀███   █    ██   ▄████
             ██▒ ▀█▒▓██ ▒ ██▒ ██  ▓██▒ ██▒ ▀█▒
@@ -21,10 +20,18 @@ public class Grug {
                 ░    ░        ░           ░
             """.stripIndent();
 
-    private static final Scanner STDIN_SCANNER = new Scanner(System.in);
+    private Ui ui;
+    private TaskList tasks;
+    private TaskStorage storage;
 
-    private static TaskList tasks = new TaskList();
-    private static TaskStorage storage = new TaskStorage("./tasks.txt");
+    /**
+     * Creates a new Grug program instance.
+     */
+    public Grug(String filepath) {
+        this.tasks = new TaskList();
+        this.storage = new TaskStorage(filepath);
+        this.ui = new Ui(new Scanner(System.in), new PrintWriter(System.out));
+    }
 
     /**
      * Converts the user's input to the appropriate {@link GrugCommand} and
@@ -32,30 +39,16 @@ public class Grug {
      *
      * @return true if program should exit, false otherwise.
      */
-    private static boolean handleUserInput() {
-        System.out.print("> ");
-        String input;
-        try {
-            // IllegalStateException should NOT be thrown since we should never close stdin
-            input = STDIN_SCANNER.nextLine().strip();
-        } catch (NoSuchElementException e) {
-            // should just quit if e.g. ctrl+c is pressed
-            System.out.println("Quitting...");
-            return true;
-        }
-
+    private boolean handleUserInput(String input) {
         GrugCommand command;
         try {
             command = GrugCommand.from(input);
         } catch (GrugCommandParserException e) {
-            System.out.println(e.getMessage());
-            System.out.println(DIALOG_SEP);
+            ui.display(e.getMessage());
             return false;
         }
 
         command.execute(tasks, storage);
-
-        System.out.println(DIALOG_SEP);
 
         boolean shouldExit = switch (command) {
             case GrugCommand.Quit() -> true;
@@ -64,22 +57,38 @@ public class Grug {
         return shouldExit;
     }
 
-    public static void main(String[] args) {
-        System.out.println(BANNER);
-        System.out.println("Loading tasks from %s...".formatted(storage.getFilepath()));
+    /**
+     * Loads tasks from the storage and displays any errors.
+     */
+    private void loadTasks() {
+        ui.display("Loading tasks from %s...", storage.getFilepath());
         try {
             storage.loadTasks().forEach(task -> tasks.addTask(task));
-            System.out.println("Loaded tasks from %s".formatted(storage.getFilepath()));
+            ui.display("Loaded tasks from %s", storage.getFilepath());
         } catch (IOException | TaskDeserializerException e) {
-            System.out.println(
-                    "Failed to load tasks from %s: %s".formatted(storage.getFilepath(), e.getMessage()));
+            ui.display("Failed to load tasks from %s: %s", storage.getFilepath(), e.getMessage());
         }
-        System.out.println("Unga. Me Grug. What do? ('bye' to quit)");
-        System.out.println(DIALOG_SEP);
+    }
 
-        boolean done = false;
-        while (!done) {
-            done = handleUserInput();
-        }
+    /**
+     * Displays the banner and greets the user.
+     */
+    private void greet() {
+        ui.display(BANNER);
+        ui.display("Unga. Me Grug. What do? ('bye' to quit)");
+        ui.displaySeperator();
+    }
+
+    /**
+     * Runs the Grug program.
+     */
+    public void run() {
+        this.loadTasks();
+        this.greet();
+        ui.runReadInputLoop(this::handleUserInput);
+    }
+
+    public static void main(String[] args) {
+        new Grug("./tasks.txt").run();
     }
 }

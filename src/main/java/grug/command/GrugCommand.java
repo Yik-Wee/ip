@@ -369,6 +369,53 @@ public sealed interface GrugCommand {
     }
 
     /**
+     * Command to list tasks whose details contain the {@code detailsSubstring},
+     * case insensitive, ignoring extra whitespace/newlines.
+     *
+     * @param detailsSubstring The details substring to use to search for the tasks.
+     */
+    record FindTasksByDetails(String detailsSubstring) implements GrugCommand {
+        /**
+         * Lists all tasks in the tasks list that contain the
+         * {@link #detailsSubstring()} (case insensitive, ignoring extra
+         * whitespace/newlines).
+         *
+         * @param tasks   The task list to read from.
+         * @param storage The task storage that is never used. Can be {@code null}
+         * @return A {@link CommandResult.Ok} result containing the list of tasks
+         *         containing the {@link #detailsSubstring()} seperated by newlines in
+         *         {@code message} (or an appropriate message
+         *         if task list is empty or no tasks coincide with the {@link #date()})
+         *         and {@code shouldExit: false}.
+         */
+        @Override
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
+            if (tasks.isEmpty()) {
+                return new CommandResult.Ok("No tasks added.", false);
+            }
+
+            StringBuilder msg = new StringBuilder();
+
+            // remove all extra whitespace/newlines
+            String targetLower = detailsSubstring.strip().replaceAll("\\s+", " ").toLowerCase();
+            for (int i = 0; i < tasks.size(); i++) {
+                // this won't throw because index is in range
+                Task task = tasks.getTask(i).get();
+                String detailsLower = task.getDetails().toLowerCase();
+                if (detailsLower.contains(targetLower)) {
+                    msg.append("%d. %s\n".formatted(i + 1, task));
+                }
+            }
+
+            if (msg.isEmpty()) {
+                return new CommandResult.Ok("No matching tasks found.", false);
+            }
+
+            return new CommandResult.Ok(msg.toString().stripTrailing(), false);
+        }
+    }
+
+    /**
      * Executes the command, modifying the {@link TaskList} or using the
      * {@link TaskStorage} if necessary.
      * <p>

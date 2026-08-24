@@ -13,7 +13,7 @@ public abstract class Task {
     public static final String DATE_TIME_INPUT_PATTERN = "[yyyy-]MM-dd[ HH[:]mm]";
     public static final DateTimeFormatter DATE_TIME_INPUT_FORMATTER = new DateTimeFormatterBuilder()
             .appendPattern(DATE_TIME_INPUT_PATTERN)
-            .parseDefaulting(ChronoField.YEAR, LocalDate.now().getYear())
+            .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .toFormatter();

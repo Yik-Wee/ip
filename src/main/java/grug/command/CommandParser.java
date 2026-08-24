@@ -8,15 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import grug.command.GrugCommand.AddDeadlineTask;
-import grug.command.GrugCommand.AddEventTask;
-import grug.command.GrugCommand.AddTodoTask;
-import grug.command.GrugCommand.DeleteTask;
-import grug.command.GrugCommand.FindTasksByDate;
-import grug.command.GrugCommand.ListTasks;
-import grug.command.GrugCommand.MarkTask;
-import grug.command.GrugCommand.Quit;
-import grug.command.GrugCommand.UnmarkTask;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.Task;
@@ -139,6 +130,7 @@ public class CommandParser {
             case "event" -> parseEventCommand(args);
             case "delete" -> parseDeleteCommand(args);
             case "find-on" -> parseFindByDateCommand(args);
+            case "find" -> parseFindByDetails(args);
             default -> throw new GrugCommandParserException.UnknownCommand(commandString);
         };
     }
@@ -148,7 +140,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link Quit} command instance
+     * @return A new {@link GrugCommand.Quit} command instance
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -169,7 +161,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link ListTasks} command instance
+     * @return A new {@link GrugCommand.ListTasks} command instance
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -190,7 +182,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link AddTodoTask} command instance
+     * @return A new {@link GrugCommand.AddTodoTask} command instance
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -213,7 +205,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link AddDeadlineTask} command instance
+     * @return A new {@link GrugCommand.AddDeadlineTask} command instance
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -248,7 +240,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link AddEventTask} command instance
+     * @return A new {@link GrugCommand.AddEventTask} command instance
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -291,7 +283,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link MarkTask} command instance
+     * @return A new {@link GrugComamand.MarkTask} command instance
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -322,7 +314,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link UnmarkTask} command instance
+     * @return A new {@link GrugComamand.UnmarkTask} command instance
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -355,7 +347,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link DeleteTask} command instance
+     * @return A new {@link GrugComamand.DeleteTask} command instance
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -386,7 +378,7 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link FindTasksByDate} command instance
+     * @return A new {@link GrugComamand.FindTasksByDate} command instance
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty
      */
@@ -414,5 +406,28 @@ public class CommandParser {
                     "must be in the format %s\n(but the time provided is ignored)"
                             .formatted(Task.DATE_TIME_INPUT_PATTERN));
         }
+    }
+
+    /**
+     * Parses the argument list `args`.
+     *
+     * @param args The list of arguments read from the input, including the initial
+     *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
+     * @return A new {@link GrugComamand.FindTasksByDetails} command instance
+     * @throws GrugCommandParserException If something went wrong parsing the args.
+     * @throws IllegalArgumentException   If args is empty
+     */
+    private static GrugCommand.FindTasksByDetails parseFindByDetails(String[] args) throws GrugCommandParserException {
+        if (args.length == 0) {
+            throw new IllegalArgumentException("`args[]` must be non-empty.");
+        }
+
+        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of());
+        if (parsedArgs.inputs().isEmpty()) {
+            throw new GrugCommandParserException.InvalidUsage("find <details>");
+        }
+        String details = String.join(" ", parsedArgs.inputs());
+
+        return new GrugCommand.FindTasksByDetails(details);
     }
 }

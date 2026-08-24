@@ -135,4 +135,33 @@ class GrugCommandTest {
                         + "3. [E][ ] event (from: Dec 24 2026 1000 | to: Dec 26 2026 1100)",
                 false), result);
     }
+
+    @Test
+    void findTasksByDetails_execute_returnsOnlyTasksContainingDetails() {
+        TaskList tasks = new TaskList(List.of(
+                new TodoTask("read book"),
+                new DeadlineTask("pead boop", "2026-12-25 17:00"),
+                new EventTask("eat poop", "2026-12-24 10:00", "2026-12-26 11:00")));
+
+        CommandResult actualResult = new GrugCommand.FindTasksByDetails("ead boo").execute(tasks, storage());
+        CommandResult expectedResult = new CommandResult.Ok(
+                "1. [T][ ] read book\n" + "2. [D][ ] pead boop (by: Dec 25 2026 1700)",
+                false);
+        assertEquals(actualResult, expectedResult);
+    }
+
+    @Test
+    void findTasksByDetails_extraWhitespaceThenExecute_ignoresExtraWhitespace() {
+        TaskList tasks = new TaskList(List.of(
+                new TodoTask("read book"),
+                new DeadlineTask("pead boop", "2026-12-25 17:00"),
+                new EventTask("eat poop", "2026-12-24 10:00", "2026-12-26 11:00")));
+
+        CommandResult actualResult = new GrugCommand.FindTasksByDetails(" \t ead  \n  \r\n boo\r")
+                .execute(tasks, storage());
+        CommandResult expectedResult = new CommandResult.Ok(
+                "1. [T][ ] read book\n" + "2. [D][ ] pead boop (by: Dec 25 2026 1700)",
+                false);
+        assertEquals(actualResult, expectedResult);
+    }
 }

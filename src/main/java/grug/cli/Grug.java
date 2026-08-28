@@ -1,4 +1,4 @@
-package grug;
+package grug.cli;
 
 import java.io.IOException;
 import java.io.PrintWriter;

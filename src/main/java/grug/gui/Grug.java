@@ -2,6 +2,7 @@ package grug.gui;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Optional;
 import java.util.Scanner;
 
 import grug.command.CommandParser;
@@ -11,6 +12,7 @@ import grug.command.GrugCommandParserException;
 import grug.storage.TaskStorage;
 import grug.storage.serde.TaskDeserializerException;
 import grug.task.TaskList;
+import grug.ui.ConsoleUi;
 import grug.ui.Ui;
 
 /**
@@ -18,6 +20,7 @@ import grug.ui.Ui;
  */
 public class Grug {
     public static final String DEFAULT_STORAGE_FILE = "./tasks.txt";
+    private static final String DIALOG_SEP = "____________________________________________________________";
     private static final String BANNER = """
             ▄████  ██▀███   █    ██   ▄████
             ██▒ ▀█▒▓██ ▒ ██▒ ██  ▓██▒ ██▒ ▀█▒
@@ -39,7 +42,8 @@ public class Grug {
      * {@code filepath}.
      *
      * @param filepath The filepath to save and load tasks data from.
-     * @param ui       The {@link Ui} instance that specifies where to read from
+     * @param ui       The {@link ConsoleUi} instance that specifies where to read
+     *                 from
      *                 (e.g. {@code System.in}) and where to write to (e.g.
      *                 {@code System.out}).
      */
@@ -51,11 +55,11 @@ public class Grug {
 
     /**
      * Creates a new Grug chatbot which saves and loads tasks from
-     * {@link #DEFAULT_STORAGE_FILE}, and with a {@link Ui} that reads from
+     * {@link #DEFAULT_STORAGE_FILE}, and with a {@link ConsoleUi} that reads from
      * {@code System.in} and outputs to {@code System.out}.
      */
     public Grug() {
-        Ui ui = new Ui(new Scanner(System.in), new PrintWriter(System.out));
+        Ui ui = new ConsoleUi(new Scanner(System.in), new PrintWriter(System.out));
         this(DEFAULT_STORAGE_FILE, ui);
     }
 
@@ -82,6 +86,11 @@ public class Grug {
      */
     public CommandResult execute(GrugCommand command) {
         return command.execute(tasks, storage);
+    }
+
+    /** TODO */
+    public Optional<String> readUserInput(String prompt) {
+        return this.ui.readInput(prompt);
     }
 
     /**
@@ -120,7 +129,7 @@ public class Grug {
     /**
      * Loads tasks from the storage and displays any errors.
      */
-    private void loadTasks() {
+    public void loadTasks() {
         ui.display("Loading tasks from %s...", storage.getFilepath());
         try {
             this.tasks = new TaskList(storage.loadTasks());
@@ -136,16 +145,32 @@ public class Grug {
     public void greet() {
         ui.display(BANNER);
         ui.display("Unga. Me Grug. What do? ('bye' to quit)");
-        ui.displaySeparator();
     }
 
     /**
-     * Runs the Grug program.
+     * Runs the Grug CLI program.
      */
     public void run() {
         this.loadTasks();
         this.greet();
-        ui.runReadInputLoop(this::handleUserInput);
+        ui.display(DIALOG_SEP);
+
+        // this repl is specific to the CLI so it lives here rather than as a method
+        // inside Ui
+        boolean isDone = false;
+        while (!isDone) {
+            Optional<String> inputOrEof = ui.readInput("> ");
+            // EOF, e.g. ctrl+c, ctrl+z, etc.
+            if (inputOrEof.isEmpty()) {
+                isDone = true;
+                continue;
+            }
+
+            String input = inputOrEof.get();
+            boolean shouldExit = this.handleUserInput(input);
+            ui.display(DIALOG_SEP);
+            isDone = shouldExit;
+        }
     }
 
     public static void main(String[] args) {

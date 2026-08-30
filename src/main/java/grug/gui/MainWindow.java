@@ -1,8 +1,6 @@
 package grug.gui;
 
-import grug.command.CommandResult;
-import grug.command.GrugCommand;
-import grug.command.GrugCommandParserException;
+import grug.ui.Ui;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -25,8 +23,16 @@ public class MainWindow extends AnchorPane {
 
     private Grug grug;
 
-    public void setGrug(Grug grug) {
-        this.grug = grug;
+    /**
+     * Initialises the Grug backend API, loads the saved tasks and greets the user.
+     */
+    public void initialiseGrugBackend() {
+        Ui ui = new GraphicalUi(this.userInput, this.dialogContainer);
+        this.grug = new Grug(Grug.DEFAULT_STORAGE_FILE, ui);
+
+        // show startup dialog and load the tasks
+        this.grug.loadTasks();
+        this.grug.greet();
     }
 
     @FXML
@@ -41,21 +47,16 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
-        String input = userInput.getText();
-        DialogBox userDialogBox = DialogBox.fromUserDialog(input);
+        String input = this.grug.readUserInput("").get();
 
-        String response;
-        try {
-            GrugCommand command = Grug.parseInput(input);
-            CommandResult result = grug.execute(command);
-            response = result.message();
-        } catch (GrugCommandParserException e) {
-            response = e.getMessage();
+        // only display the user's dialog box if its not blank
+        // but don't return since blank could be a valid command
+        if (!input.isBlank()) {
+            DialogBox userDialogBox = DialogBox.fromUserDialog(input);
+            this.dialogContainer.getChildren().add(userDialogBox);
         }
+        this.userInput.clear();
 
-        DialogBox botDialogBox = DialogBox.fromGrugDialog(response);
-
-        dialogContainer.getChildren().addAll(userDialogBox, botDialogBox);
-        userInput.clear();
+        this.grug.handleUserInput(input);
     }
 }

@@ -30,7 +30,7 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 ## Coding Standard:
 
-All code in this project must strictly adhere to the project-specific skill `seedu-java-coding-standard`, based on the rules outlined in [https://se-education.org/guides/conventions/java/intermediate.html](https://se-education.org/guides/conventions/java/intermediate.html). Ensure compliance during all code creation and refactoring tasks.
+Before creating, modifying, refactoring, or reviewing Java code, invoke the project-specific `seedu-java-coding-standard` skill. All Java code in this project must strictly adhere to that skill, which is based on the rules outlined in [https://se-education.org/guides/conventions/java/intermediate.html](https://se-education.org/guides/conventions/java/intermediate.html). Review every affected Java file for compliance before completing the task.
 
 ## Code update verification:
 

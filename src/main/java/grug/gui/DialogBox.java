@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 
 /**
  * Represents a dialog box consisting of an ImageView to represent the speaker's
@@ -57,6 +58,7 @@ public class DialogBox extends HBox {
      */
     public static DialogBox fromGrugDialog(String response) {
         var db = new DialogBox(response);
+        db.dialog.setFont(Font.font("Monospaced"));
         db.flip();
         return db;
     }

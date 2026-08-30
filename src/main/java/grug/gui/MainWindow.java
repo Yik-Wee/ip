@@ -1,5 +1,8 @@
 package grug.gui;
 
+import grug.command.CommandResult;
+import grug.command.GrugCommand;
+import grug.command.GrugCommandParserException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -20,6 +23,12 @@ public class MainWindow extends AnchorPane {
     @FXML
     private Button sendButton;
 
+    private Grug grug;
+
+    public void setGrug(Grug grug) {
+        this.grug = grug;
+    }
+
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
@@ -34,7 +43,18 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         DialogBox userDialogBox = DialogBox.fromUserDialog(input);
-        DialogBox botDialogBox = DialogBox.fromGrugDialog("unga: " + input);
+
+        String response;
+        try {
+            GrugCommand command = Grug.parseInput(input);
+            CommandResult result = grug.execute(command);
+            response = result.message();
+        } catch (GrugCommandParserException e) {
+            response = e.getMessage();
+        }
+
+        DialogBox botDialogBox = DialogBox.fromGrugDialog(response);
+
         dialogContainer.getChildren().addAll(userDialogBox, botDialogBox);
         userInput.clear();
     }

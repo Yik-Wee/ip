@@ -1,4 +1,4 @@
-package grug.cli;
+package grug.gui;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,9 +14,10 @@ import grug.task.TaskList;
 import grug.ui.Ui;
 
 /**
- * Entrypoint of the Grug chatbot application
+ * Exposes the API to control the Grug chatbot.
  */
 public class Grug {
+    public static final String DEFAULT_STORAGE_FILE = "./tasks.txt";
     private static final String BANNER = """
             ▄████  ██▀███   █    ██   ▄████
             ██▒ ▀█▒▓██ ▒ ██▒ ██  ▓██▒ ██▒ ▀█▒
@@ -34,21 +35,62 @@ public class Grug {
     private TaskStorage storage;
 
     /**
-     * Creates a new Grug program instance.
+     * Creates a new Grug chatbot instance which saves and loads tasks from the
+     * {@code filepath}.
+     *
+     * @param filepath The filepath to save and load tasks data from.
+     * @param ui       The {@link Ui} instance that specifies where to read from
+     *                 (e.g. {@code System.in}) and where to write to (e.g.
+     *                 {@code System.out}).
      */
-    public Grug(String filepath) {
+    public Grug(String filepath, Ui ui) {
         this.tasks = new TaskList();
         this.storage = new TaskStorage(filepath);
-        this.ui = new Ui(new Scanner(System.in), new PrintWriter(System.out));
+        this.ui = ui;
+    }
+
+    /**
+     * Creates a new Grug chatbot which saves and loads tasks from
+     * {@link #DEFAULT_STORAGE_FILE}, and with a {@link Ui} that reads from
+     * {@code System.in} and outputs to {@code System.out}.
+     */
+    public Grug() {
+        Ui ui = new Ui(new Scanner(System.in), new PrintWriter(System.out));
+        this(DEFAULT_STORAGE_FILE, ui);
+    }
+
+    /**
+     * Parses raw user input and maps it to the appropriate {@link GrugCommand}
+     * variant.
+     *
+     * @param input the raw string input from the user's terminal.
+     * @return the corresponding command variant.
+     * @throws GrugCommandParserException if there was an error parsing the input.
+     * @see CommandParser#parseInput(String)
+     */
+    public static GrugCommand parseInput(String input) throws GrugCommandParserException {
+        return CommandParser.parseInput(input);
+    }
+
+    /**
+     * Executes the command and may mutate the state of the instance's task list and
+     * storage depending on the command.
+     *
+     * @param command The command to execute.
+     * @return The result of executing the command, including the message and
+     *         whether the program should exit.
+     */
+    public CommandResult execute(GrugCommand command) {
+        return command.execute(tasks, storage);
     }
 
     /**
      * Converts the user's input to the appropriate {@link GrugCommand} and
-     * exeuctes the command.
+     * executes the command.
      *
      * @return true if program should exit, false otherwise.
      */
-    private boolean handleUserInput(String input) {
+    public boolean handleUserInput(String input) {
         GrugCommand command;
         try {
             command = CommandParser.parseInput(input);
@@ -91,7 +133,7 @@ public class Grug {
     /**
      * Displays the banner and greets the user.
      */
-    private void greet() {
+    public void greet() {
         ui.display(BANNER);
         ui.display("Unga. Me Grug. What do? ('bye' to quit)");
         ui.displaySeparator();
@@ -107,6 +149,6 @@ public class Grug {
     }
 
     public static void main(String[] args) {
-        new Grug("./tasks.txt").run();
+        new Grug().run();
     }
 }

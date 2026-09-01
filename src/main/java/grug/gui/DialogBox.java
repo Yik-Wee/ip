@@ -36,6 +36,7 @@ public class DialogBox extends HBox {
      */
     private void flip() {
         setAlignment(Pos.TOP_LEFT);
+        this.dialog.getStyleClass().add("reply-label");
     }
 
     /**

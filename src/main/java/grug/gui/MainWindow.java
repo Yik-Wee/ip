@@ -35,9 +35,16 @@ public class MainWindow extends AnchorPane {
         this.grug.greet();
     }
 
+    /**
+     * Sets the behavior of the {@link #dialogContainer} to scroll to the bottom
+     * when its height changes (i.e. when a new dialog is added).
+     */
     @FXML
     public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        // scroll to the bottom when vbox height changes
+        this.dialogContainer.heightProperty().addListener((observable, oldHeight, newHeight) -> {
+            this.scrollPane.setVvalue(this.scrollPane.getVmax());
+        });
     }
 
     /**

@@ -21,7 +21,6 @@ public class ConsoleUi implements Ui {
     public ConsoleUi(Scanner reader, PrintWriter writer) {
         this.reader = reader;
         this.writer = writer;
-        System.out.println();
     }
 
     /**

@@ -1,6 +1,7 @@
 package grug.gui;
 
 import grug.ui.Ui;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -64,6 +65,9 @@ public class MainWindow extends AnchorPane {
         }
         this.userInput.clear();
 
-        this.grug.handleUserInput(input);
+        boolean shouldExit = this.grug.handleUserInput(input);
+        if (shouldExit) {
+            Platform.exit();
+        }
     }
 }

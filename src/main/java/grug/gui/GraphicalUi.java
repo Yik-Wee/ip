@@ -19,7 +19,7 @@ public class GraphicalUi implements Ui {
      * {@code userInput} and displays responses to the {@code dialogContainer}.
      *
      * @param userInput       The {@link TextField} to read from.
-     * @param dialogContainer The {@VBox} to display text to.
+     * @param dialogContainer The {@link VBox} to display text to.
      */
     public GraphicalUi(TextField userInput, VBox dialogContainer) {
         this.userInput = userInput;

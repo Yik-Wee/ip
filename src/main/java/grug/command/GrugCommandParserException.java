@@ -12,7 +12,7 @@ public class GrugCommandParserException extends Exception {
     /**
      * Creates a new GrugCommandParserException with the supplied {@code msg}.
      *
-     * @param msg The perser error message.
+     * @param msg The parser error message.
      */
     public GrugCommandParserException(String msg) {
         super(msg);

@@ -17,7 +17,7 @@ import grug.task.TodoTask;
  * // save the result to a file...
  * }</pre>
  *
- * @see #serialize(Task) The general serialized format
+ * @see #serialize(Task) The general serialized format.
  */
 public class TaskSerializer {
     /**
@@ -57,7 +57,7 @@ public class TaskSerializer {
      * @return The serialized task.
      */
     public static String serialize(TodoTask task) {
-        String completed = task.getCompleted() ? "1" : "0";
+        String completed = task.isCompleted() ? "1" : "0";
         String details = task.getDetails().replace("\n", "\\n");
         return """
                 [todo]
@@ -80,7 +80,7 @@ public class TaskSerializer {
      * @return The serialized task.
      */
     public static String serialize(DeadlineTask task) {
-        String completed = task.getCompleted() ? "1" : "0";
+        String completed = task.isCompleted() ? "1" : "0";
         String details = task.getDetails().replace("\n", "\\n");
         String by = task.getDeadlineDatetime().format(DeadlineTask.DATE_TIME_INPUT_FORMATTER);
         return """
@@ -106,7 +106,7 @@ public class TaskSerializer {
      * @return The serialized task.
      */
     public static String serialize(EventTask task) {
-        String completed = task.getCompleted() ? "1" : "0";
+        String completed = task.isCompleted() ? "1" : "0";
         String details = task.getDetails().replace("\n", "\\n");
         String start = task.getStartDatetime().format(EventTask.DATE_TIME_INPUT_FORMATTER);
         String end = task.getEndDatetime().format(EventTask.DATE_TIME_INPUT_FORMATTER);

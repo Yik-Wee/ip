@@ -23,9 +23,9 @@ public sealed interface GrugCommand {
          * Does nothing.
          *
          * @param tasks   The task list that is never used. Can be {@code null}.
-         * @param storage The task storage that is never used. Can be {@code null}
+         * @param storage The task storage that is never used. Can be {@code null}.
          * @return A {@link CommandResult.Ok} result containing an empty {@code message}
-         *         and {@code shouldExit: false}
+         *         and {@code shouldExit: false}.
          */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
@@ -41,9 +41,9 @@ public sealed interface GrugCommand {
          * Does nothing.
          *
          * @param tasks   The task list that is never used. Can be {@code null}.
-         * @param storage The task storage that is never used. Can be {@code null}
+         * @param storage The task storage that is never used. Can be {@code null}.
          * @return A {@link CommandResult.Ok} result containing the quit {@code message}
-         *         and {@code shouldExit: false}
+         *         and {@code shouldExit: false}.
          */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
@@ -59,9 +59,9 @@ public sealed interface GrugCommand {
          * Lists all tasks in the tasks list.
          *
          * @param tasks   The task list to read from.
-         * @param storage The task storage that is never used. Can be {@code null}
+         * @param storage The task storage that is never used. Can be {@code null}.
          * @return A {@link CommandResult.Ok} result containing the list of tasks
-         *         seperated by newlines in {@code message} (or an appropriate message
+         *         separated by newlines in {@code message} (or an appropriate message
          *         if task list is empty) and {@code shouldExit: false}.
          */
         @Override
@@ -200,7 +200,7 @@ public sealed interface GrugCommand {
          * @param tasks   The task list to modify.
          * @param storage The task storage to save to.
          * @return A {@link CommandResult.Err} if index is out of range, with
-         *         appropriate error {@message} and {@code shouldExit: false}.
+         *         appropriate error {@code message} and {@code shouldExit: false}.
          *
          *         Else, a {@link CommandResult.Partial} if tasks failed to be
          *         saved to the {@code storage}, with {@code message} containing the
@@ -248,7 +248,7 @@ public sealed interface GrugCommand {
          * @param tasks   The task list to modify.
          * @param storage The task storage to save to.
          * @return A {@link CommandResult.Err} if index is out of range, with
-         *         appropriate error {@message} and {@code shouldExit: false}.
+         *         appropriate error {@code message} and {@code shouldExit: false}.
          *
          *         Else, a {@link CommandResult.Partial} if tasks failed to be
          *         saved to the {@code storage}, with {@code message} containing the
@@ -336,9 +336,9 @@ public sealed interface GrugCommand {
          * {@link #date()}.
          *
          * @param tasks   The task list to read from.
-         * @param storage The task storage that is never used. Can be {@code null}
+         * @param storage The task storage that is never used. Can be {@code null}.
          * @return A {@link CommandResult.Ok} result containing the list of tasks
-         *         coinciding the the {@link #date()} seperated by newlines in
+         *         coinciding the the {@link #date()} separated by newlines in
          *         {@code message} (or an appropriate message
          *         if task list is empty or no tasks coincide with the {@link #date()})
          *         and {@code shouldExit: false}.
@@ -381,9 +381,9 @@ public sealed interface GrugCommand {
          * whitespace/newlines).
          *
          * @param tasks   The task list to read from.
-         * @param storage The task storage that is never used. Can be {@code null}
+         * @param storage The task storage that is never used. Can be {@code null}.
          * @return A {@link CommandResult.Ok} result containing the list of tasks
-         *         containing the {@link #detailsSubstring()} seperated by newlines in
+         *         containing the {@link #detailsSubstring()} separated by newlines in
          *         {@code message} (or an appropriate message
          *         if task list is empty or no tasks coincide with the {@link #date()})
          *         and {@code shouldExit: false}.

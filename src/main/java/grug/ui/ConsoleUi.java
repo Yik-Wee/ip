@@ -49,7 +49,7 @@ public class ConsoleUi implements Ui {
     /**
      * Displays the message in red.
      *
-     * @param message The messgae to display.
+     * @param message The message to display.
      */
     @Override
     public void displayError(String message) {
@@ -62,7 +62,7 @@ public class ConsoleUi implements Ui {
     /**
      * Displays the message in yellow.
      *
-     * @param message The messgae to display.
+     * @param message The message to display.
      */
     @Override
     public void displayWarning(String message) {

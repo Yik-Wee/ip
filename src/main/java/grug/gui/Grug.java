@@ -88,7 +88,12 @@ public class Grug {
         return command.execute(tasks, storage);
     }
 
-    /** TODO */
+    /**
+     * Reads the user's input after displaying the prompt.
+     *
+     * @param prompt The prompt to display.
+     * @return The user's input, or an empty optional if no input is available.
+     */
     public Optional<String> readUserInput(String prompt) {
         return this.ui.readInput(prompt);
     }
@@ -108,9 +113,9 @@ public class Grug {
             return false;
         }
 
-        CommandResult res = command.execute(tasks, storage);
+        CommandResult result = command.execute(tasks, storage);
 
-        switch (res) {
+        switch (result) {
             case CommandResult.Ok(String message, boolean shouldExit) -> {
                 ui.display(message);
                 return shouldExit;

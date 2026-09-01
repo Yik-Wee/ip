@@ -16,8 +16,7 @@ public class GrugApp extends Application {
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(GrugApp.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane ap;
-            ap = fxmlLoader.load();
+            AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
 

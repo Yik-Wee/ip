@@ -63,7 +63,7 @@ public abstract class Task {
         return this.details;
     }
 
-    public boolean getCompleted() {
+    public boolean isCompleted() {
         return this.isCompleted;
     }
 

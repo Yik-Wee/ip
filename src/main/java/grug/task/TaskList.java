@@ -29,7 +29,9 @@ public class TaskList {
     }
 
     /**
-     * @return The <b>unmodifiable</b> task list
+     * Returns the task list.
+     *
+     * @return The <b>unmodifiable</b> task list.
      */
     public List<Task> getTasks() {
         return List.copyOf(this.tasks);
@@ -94,6 +96,8 @@ public class TaskList {
     }
 
     /**
+     * Returns the number of elements in the task list.
+     *
      * @return The number of elements in the task list.
      */
     public int size() {

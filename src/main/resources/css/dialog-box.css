@@ -1,0 +1,15 @@
+.label {
+    -fx-background-color: linear-gradient(to bottom right, #00ffb3, #00ff4c);
+    -fx-border-color: #d55e00 #009e73 #cc79a7 #0072b2;
+    -fx-border-width: 2px;
+    -fx-background-radius: 1em 1em 0 1em;
+    -fx-border-radius: 1em 1em 0 1em;
+    -fx-padding: 8px;
+}
+
+.reply-label {
+    -fx-background-color: linear-gradient(to bottom right, #00ffbf, #00ddff);
+    -fx-border-color: #0023d5 #009e73 #9679cc #0072b2;
+    -fx-background-radius: 1em 1em 1em 0;
+    -fx-border-radius: 1em 1em 1em 0;
+}

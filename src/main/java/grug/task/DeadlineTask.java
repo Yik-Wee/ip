@@ -14,7 +14,7 @@ public class DeadlineTask extends Task {
     /**
      * Creates a new {@link DeadlineTask} that is incomplete.
      *
-     * @param details  The details of the taks.
+     * @param details  The details of the task.
      * @param deadline The deadline date/time of the task.
      * @throws DateTimeParseException If the deadline text cannot be parsed.
      */

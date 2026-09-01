@@ -11,7 +11,7 @@ public class TaskDeserializerException extends Exception {
     /**
      * Creates an exception with a description of the deserialization failure.
      *
-     * @param message a description of the failure
+     * @param message a description of the failure.
      */
     public TaskDeserializerException(String message) {
         super(message);
@@ -20,8 +20,8 @@ public class TaskDeserializerException extends Exception {
     /**
      * Creates an exception with a description and the underlying cause.
      *
-     * @param message a description of the failure
-     * @param cause   the underlying cause
+     * @param message a description of the failure.
+     * @param cause   the underlying cause.
      */
     public TaskDeserializerException(String message, Throwable cause) {
         super(message, cause);

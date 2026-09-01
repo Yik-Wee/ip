@@ -41,6 +41,6 @@ class TaskStorageTest {
         assertTrue(Files.exists(path));
         assertEquals(1, loaded.size());
         assertEquals("read book", loaded.get(0).getDetails());
-        assertTrue(loaded.get(0).getCompleted());
+        assertTrue(loaded.get(0).isCompleted());
     }
 }

@@ -27,11 +27,11 @@ public class TaskDeserializer {
      * to {@link #deserializeOne(String)}.
      * <p>
      *
-     * @param serializedTasks the serialized task list
-     * @return the deserialized tasks, in their serialized order
+     * @param serializedTasks the serialized task list.
+     * @return the deserialized tasks, in their serialized order.
      * @throws TaskDeserializerException if the input contains data before the
      *                                   first task header or if a task block is
-     *                                   invalid
+     *                                   invalid.
      */
     public static List<Task> deserializeMany(String serializedTasks) throws TaskDeserializerException {
         if (serializedTasks == null) {
@@ -162,7 +162,7 @@ public class TaskDeserializer {
      * The following are rules for deserialization that the serialized string must
      * follow (not task specific):
      * - The header {@code [task-type]} and properties {@code prop = value} must all
-     * be on seperate lines and follow that format exactly.
+     * be on separate lines and follow that format exactly.
      * - The header must come before all properties.
      * - Properties can be in any order.
      * - Each property occupies exactly 1 line (i.e. cannot be split into multiple

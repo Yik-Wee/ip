@@ -10,8 +10,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 
 /**
- * Represents a dialog box consisting of an ImageView to represent the speaker's
- * face and a label containing text from the speaker.
+ * Represents a dialog box consisting of a label containing text from the
+ * speaker.
  */
 public class DialogBox extends HBox {
     @FXML

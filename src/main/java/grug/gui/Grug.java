@@ -139,8 +139,12 @@ public class Grug {
         try {
             this.tasks = new TaskList(storage.loadTasks());
             ui.display("Loaded tasks from %s", storage.getFilepath());
-        } catch (IOException | TaskDeserializerException e) {
-            ui.display("Failed to load tasks from %s: %s", storage.getFilepath(), e.getMessage());
+        } catch (TaskDeserializerException e) {
+            ui.displayWarning("May overwrite malformed tasks file `%s`: %s".formatted(
+                    this.storage.getFilepath(), e.getMessage()));
+        } catch (IOException e) {
+            ui.display("No tasks to load (or `%s` could not be opened)".formatted(
+                    this.storage.getFilepath()));
         }
     }
 

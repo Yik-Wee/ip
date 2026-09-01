@@ -21,6 +21,9 @@ public class GrugApp extends Application {
             Scene scene = new Scene(ap);
             stage.setScene(scene);
 
+            stage.setMinHeight(220);
+            stage.setMinWidth(417);
+
             MainWindow mainWindowController = fxmlLoader.<MainWindow>getController();
             mainWindowController.initialiseGrugBackend();
 

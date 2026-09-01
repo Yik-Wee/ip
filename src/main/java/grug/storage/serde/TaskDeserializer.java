@@ -69,15 +69,7 @@ public class TaskDeserializer {
         List<Task> tasks = new ArrayList<>();
         for (int i = 0; i < serializedTaskBlocks.size(); i++) {
             String serializedTask = serializedTaskBlocks.get(i);
-            try {
-                tasks.add(deserializeOne(serializedTask));
-            } catch (TaskDeserializerException e) {
-                System.out.println(
-                        "Skipped task %d/%d: %s".formatted(
-                                i + 1,
-                                serializedTaskBlocks.size(),
-                                e.getMessage()));
-            }
+            tasks.add(deserializeOne(serializedTask));
         }
         return tasks;
     }
@@ -139,7 +131,8 @@ public class TaskDeserializer {
 
             String[] parts = line.split("=", 2);
             if (parts.length != 2) {
-                throw new TaskDeserializerException("Property `%s` does not specify a value with an =");
+                throw new TaskDeserializerException(
+                        "Property `%s` does not specify a value with an =".formatted(line));
             }
 
             String property = parts[0].strip().toLowerCase();

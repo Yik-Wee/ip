@@ -18,7 +18,7 @@ public sealed interface GrugCommand {
     /**
      * Represents no command given.
      */
-    record Empty() implements GrugCommand {
+    record EmptyCommand() implements GrugCommand {
         /**
          * Does nothing.
          *
@@ -36,7 +36,7 @@ public sealed interface GrugCommand {
     /**
      * Command to quit the program.
      */
-    record Quit() implements GrugCommand {
+    record QuitCommand() implements GrugCommand {
         /**
          * Does nothing.
          *
@@ -54,7 +54,7 @@ public sealed interface GrugCommand {
     /**
      * Command to list all tasks.
      */
-    record ListTasks() implements GrugCommand {
+    record ListTasksCommand() implements GrugCommand {
         /**
          * Lists all tasks in the tasks list.
          *
@@ -71,7 +71,7 @@ public sealed interface GrugCommand {
             }
 
             StringBuilder msg = new StringBuilder();
-            for (int i = 0; i < tasks.size(); i++) {
+            for (int i = 0; i < tasks.getSize(); i++) {
                 // Optional::get() here will not throw since our index is always in range
                 msg.append("%d. %s\n".formatted(i + 1, tasks.getTask(i).get()));
             }
@@ -84,7 +84,7 @@ public sealed interface GrugCommand {
      *
      * @param task the task to add.
      */
-    record AddTodoTask(TodoTask task) implements GrugCommand {
+    record AddTodoTaskCommand(TodoTask task) implements GrugCommand {
         /**
          * Adds a new {@link TodoTask} to the tasks list, then attempts to save the save
          * the list to disk.
@@ -120,7 +120,7 @@ public sealed interface GrugCommand {
      *
      * @param task The task to add.
      */
-    record AddDeadlineTask(DeadlineTask task) implements GrugCommand {
+    record AddDeadlineTaskCommand(DeadlineTask task) implements GrugCommand {
         /**
          * Adds a new {@link DeadlineTask} to the tasks list, then attempts to save the
          * save the list to disk.
@@ -156,7 +156,7 @@ public sealed interface GrugCommand {
      *
      * @param task The task to add.
      */
-    record AddEventTask(EventTask task) implements GrugCommand {
+    record AddEventTaskCommand(EventTask task) implements GrugCommand {
         /**
          * Adds a new {@link EventTask} to the tasks list, then attempts to save the
          * save the list to disk.
@@ -192,7 +192,7 @@ public sealed interface GrugCommand {
      *
      * @param taskNum The 1-based task number.
      */
-    record MarkTask(int taskNum) implements GrugCommand {
+    record MarkTaskCommand(int taskNum) implements GrugCommand {
         /**
          * Marks the {@link #taskNum()}-th task (1-based) as complete, then attempts to
          * save the list to disk.
@@ -240,7 +240,7 @@ public sealed interface GrugCommand {
      *
      * @param taskNum The 1-based task number.
      */
-    record UnmarkTask(int taskNum) implements GrugCommand {
+    record UnmarkTaskCommand(int taskNum) implements GrugCommand {
         /**
          * Unmarks the {@link #taskNum()}-th task (1-based) as incomplete, then attempts
          * to save the list to disk.
@@ -288,7 +288,7 @@ public sealed interface GrugCommand {
      *
      * @param taskNum The task to delete.
      */
-    record DeleteTask(int taskNum) implements GrugCommand {
+    record DeleteTaskCommand(int taskNum) implements GrugCommand {
         /**
          * Deletes the {@link #taskNum()}-th task (1-based) from the task list, then
          * attempts to save the list to disk.
@@ -330,7 +330,7 @@ public sealed interface GrugCommand {
     /**
      * Command to list tasks that coincide with a given date.
      */
-    record FindTasksByDate(LocalDate date) implements GrugCommand {
+    record FindTasksByDateCommand(LocalDate date) implements GrugCommand {
         /**
          * Lists all tasks in the tasks list that coincide with the target
          * {@link #date()}.
@@ -351,7 +351,7 @@ public sealed interface GrugCommand {
 
             StringBuilder msg = new StringBuilder();
 
-            for (int i = 0; i < tasks.size(); i++) {
+            for (int i = 0; i < tasks.getSize(); i++) {
                 // get() here will not throw because index is in range
                 Task task = tasks.getTask(i).get();
 
@@ -374,7 +374,7 @@ public sealed interface GrugCommand {
      *
      * @param detailsSubstring The details substring to use to search for the tasks.
      */
-    record FindTasksByDetails(String detailsSubstring) implements GrugCommand {
+    record FindTasksByDetailsCommand(String detailsSubstring) implements GrugCommand {
         /**
          * Lists all tasks in the tasks list that contain the
          * {@link #detailsSubstring()} (case insensitive, ignoring extra
@@ -398,7 +398,7 @@ public sealed interface GrugCommand {
 
             // remove all extra whitespace/newlines
             String targetLower = detailsSubstring.strip().replaceAll("\\s+", " ").toLowerCase();
-            for (int i = 0; i < tasks.size(); i++) {
+            for (int i = 0; i < tasks.getSize(); i++) {
                 // this won't throw because index is in range
                 Task task = tasks.getTask(i).get();
                 String detailsLower = task.getDetails().toLowerCase();
@@ -419,7 +419,7 @@ public sealed interface GrugCommand {
      * Executes the command, modifying the {@link TaskList} or using the
      * {@link TaskStorage} if necessary.
      * <p>
-     * For example, `{@link AddTodoTask}::execute()` should add the task
+     * For example, `{@link AddTodoTaskCommand}::execute()` should add the task
      * to the list of tasks.
      *
      * @param tasks   The task list that the command may modify.

@@ -203,9 +203,9 @@ public class TaskDeserializer {
         var properties = parseBodyProperties(lines.subList(1, lines.size()));
 
         Task task = switch (taskType) {
-            case "todo" -> todoFromProperties(properties);
-            case "deadline" -> deadlineFromProperties(properties);
-            case "event" -> eventFromProperties(properties);
+            case "todo" -> createTodoFromProperties(properties);
+            case "deadline" -> createDeadlineFromProperties(properties);
+            case "event" -> createEventFromProperties(properties);
             default -> throw new TaskDeserializerException(
                     "Invalid task type [%s] found".formatted(taskType));
         };
@@ -220,7 +220,7 @@ public class TaskDeserializer {
      * @throws TaskDeserializerException If certain properties required by the task
      *                                   are not present.
      */
-    private static TodoTask todoFromProperties(HashMap<String, String> properties)
+    private static TodoTask createTodoFromProperties(HashMap<String, String> properties)
             throws TaskDeserializerException {
         // empty string if details not provided
         String details = properties.get("details");
@@ -245,7 +245,7 @@ public class TaskDeserializer {
      * @throws TaskDeserializerException If certain properties required by the task
      *                                   are not present.
      */
-    private static DeadlineTask deadlineFromProperties(HashMap<String, String> properties)
+    private static DeadlineTask createDeadlineFromProperties(HashMap<String, String> properties)
             throws TaskDeserializerException {
         // empty string if details not provided
         String details = properties.get("details");
@@ -282,7 +282,7 @@ public class TaskDeserializer {
      * @throws TaskDeserializerException If certain properties required by the task
      *                                   are not present.
      */
-    private static EventTask eventFromProperties(HashMap<String, String> properties)
+    private static EventTask createEventFromProperties(HashMap<String, String> properties)
             throws TaskDeserializerException {
         // empty string if details not provided
         String details = properties.get("details");

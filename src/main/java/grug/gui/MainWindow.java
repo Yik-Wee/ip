@@ -25,9 +25,9 @@ public class MainWindow extends AnchorPane {
     private Grug grug;
 
     /**
-     * Initialises the Grug backend API, loads the saved tasks and greets the user.
+     * Initializes the Grug backend API, loads the saved tasks and greets the user.
      */
-    public void initialiseGrugBackend() {
+    public void initializeGrugBackend() {
         Ui ui = new GraphicalUi(this.userInput, this.dialogContainer);
         this.grug = new Grug(Grug.DEFAULT_STORAGE_FILE, ui);
 
@@ -60,7 +60,7 @@ public class MainWindow extends AnchorPane {
         // only display the user's dialog box if its not blank
         // but don't return since blank could be a valid command
         if (!input.isBlank()) {
-            DialogBox userDialogBox = DialogBox.fromUserDialog(input);
+            DialogBox userDialogBox = DialogBox.createFromUserDialog(input);
             this.dialogContainer.getChildren().add(userDialogBox);
         }
         this.userInput.clear();

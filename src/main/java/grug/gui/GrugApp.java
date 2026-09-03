@@ -24,7 +24,7 @@ public class GrugApp extends Application {
             stage.setMinWidth(417);
 
             MainWindow mainWindowController = fxmlLoader.<MainWindow>getController();
-            mainWindowController.initialiseGrugBackend();
+            mainWindowController.initializeGrugBackend();
 
             stage.show();
         } catch (IOException e) {

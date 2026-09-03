@@ -36,11 +36,11 @@ class TaskStorageTest {
         task.markComplete();
 
         storage.saveTasks(List.of(task));
-        List<Task> loaded = storage.loadTasks();
+        List<Task> tasks = storage.loadTasks();
 
         assertTrue(Files.exists(path));
-        assertEquals(1, loaded.size());
-        assertEquals("read book", loaded.get(0).getDetails());
-        assertTrue(loaded.get(0).isCompleted());
+        assertEquals(1, tasks.size());
+        assertEquals("read book", tasks.get(0).getDetails());
+        assertTrue(tasks.get(0).isCompleted());
     }
 }

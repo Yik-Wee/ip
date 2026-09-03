@@ -32,7 +32,7 @@ public class GraphicalUi implements Ui {
             return;
         }
 
-        DialogBox botDialogBox = DialogBox.fromGrugDialog(message);
+        DialogBox botDialogBox = DialogBox.createFromGrugDialog(message);
         this.dialogContainer.getChildren().add(botDialogBox);
     }
 

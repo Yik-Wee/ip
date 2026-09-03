@@ -46,7 +46,7 @@ public class DialogBox extends HBox {
      * @param text The user's dialog text.
      * @return The {@link DialogBox} containing the user's dialog text.
      */
-    public static DialogBox fromUserDialog(String text) {
+    public static DialogBox createFromUserDialog(String text) {
         return new DialogBox(text);
     }
 
@@ -57,7 +57,7 @@ public class DialogBox extends HBox {
      * @param response Grug's dialog text/response.
      * @return The {@link DialogBox} containing Grug's dialog text.
      */
-    public static DialogBox fromGrugDialog(String response) {
+    public static DialogBox createFromGrugDialog(String response) {
         var db = new DialogBox(response);
         db.dialog.setFont(Font.font("Monospaced"));
         db.flip();

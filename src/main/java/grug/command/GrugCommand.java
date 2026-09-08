@@ -3,6 +3,8 @@ package grug.command;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import grug.storage.TaskStorage;
 import grug.task.Task;
@@ -67,12 +69,11 @@ public sealed interface GrugCommand {
                 return new CommandResult.Ok("No tasks added.", false);
             }
 
-            StringBuilder msg = new StringBuilder();
-            for (int i = 0; i < tasks.getSize(); i++) {
-                // Optional::get() here will not throw since our index is always in range
-                msg.append("%d. %s\n".formatted(i + 1, tasks.getTask(i).get()));
-            }
-            return new CommandResult.Ok(msg.toString().stripTrailing(), false);
+            String msg = IntStream.range(0, tasks.getSize())
+                    .mapToObj(i -> "%d. %s".formatted(i + 1, tasks.getTaskUnchecked(i)))
+                    .collect(Collectors.joining("\n"));
+
+            return new CommandResult.Ok(msg, false);
         }
     }
 
@@ -274,16 +275,10 @@ public sealed interface GrugCommand {
                 return new CommandResult.Ok("No tasks added.", false);
             }
 
-            StringBuilder msg = new StringBuilder();
-
-            for (int i = 0; i < tasks.getSize(); i++) {
-                // get() here will not throw because index is in range
-                Task task = tasks.getTask(i).get();
-
-                if (task.doesOccurOn(date)) {
-                    msg.append("%d. %s\n".formatted(i + 1, task));
-                }
-            }
+            String msg = IntStream.range(0, tasks.getSize())
+                    .filter(i -> tasks.getTaskUnchecked(i).doesOccurOn(date))
+                    .mapToObj(i -> "%d. %s".formatted(i + 1, tasks.getTaskUnchecked(i)))
+                    .collect(Collectors.joining("\n"));
 
             if (msg.isEmpty()) {
                 return new CommandResult.Ok("No tasks occuring on that date", false);
@@ -319,18 +314,11 @@ public sealed interface GrugCommand {
                 return new CommandResult.Ok("No tasks added.", false);
             }
 
-            StringBuilder msg = new StringBuilder();
-
-            // remove all extra whitespace/newlines
             String targetLower = detailsSubstring.strip().replaceAll("\\s+", " ").toLowerCase();
-            for (int i = 0; i < tasks.getSize(); i++) {
-                // this won't throw because index is in range
-                Task task = tasks.getTask(i).get();
-                String detailsLower = task.getDetails().toLowerCase();
-                if (detailsLower.contains(targetLower)) {
-                    msg.append("%d. %s\n".formatted(i + 1, task));
-                }
-            }
+            String msg = IntStream.range(0, tasks.getSize())
+                    .filter(i -> tasks.getTaskUnchecked(i).getDetails().toLowerCase().contains(targetLower))
+                    .mapToObj(i -> "%d. %s".formatted(i + 1, tasks.getTaskUnchecked(i)))
+                    .collect(Collectors.joining("\n"));
 
             if (msg.isEmpty()) {
                 return new CommandResult.Ok("No matching tasks found.", false);

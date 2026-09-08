@@ -107,6 +107,9 @@ public class TaskDeserializer {
 
         // guaranteed not to throw since there is exactly 1 capture group (apart from
         // the entire matching subsequence) if found
+        // note: group 0 is not included in groupCount(), but is included in group()
+        assert matcher.groupCount() == 1
+                : "The serialized task is valid, but does not contain exactly 1 capture group";
         return matcher.group(1).toLowerCase();
     }
 
@@ -318,8 +321,17 @@ public class TaskDeserializer {
                     e);
         }
 
-        // guaranteed not to throw now that we validated start and end
-        EventTask task = new EventTask(details, start, end);
+        // guaranteed not to throw DateTimeParseException now that we validated start
+        // and end
+        EventTask task = null;
+        try {
+            task = new EventTask(details, start, end);
+        } catch (IllegalArgumentException e) {
+            throw new TaskDeserializerException(
+                    "[event] property start `%s` must be a date/time occuring before or on end `%s`"
+                            .formatted(start, end),
+                    e);
+        }
 
         // only set isCompleted to true if `completed = 1`
         if ("1".equals(properties.get("completed"))) {

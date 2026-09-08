@@ -18,12 +18,17 @@ public class EventTask extends Task {
      * @param details The details of the task.
      * @param start   The start date/time of the task.
      * @param end     The end date/time of the task.
-     * @throws DateTimeParseException If the start or end text cannot be parsed.
+     * @throws DateTimeParseException   If the start or end text cannot be parsed.
+     * @throws IllegalArgumentException If start comes *after* end.
      */
     public EventTask(String details, String start, String end) {
         super(details);
         this.startDatetime = LocalDateTime.parse(start, DATE_TIME_INPUT_FORMATTER);
         this.endDatetime = LocalDateTime.parse(end, DATE_TIME_INPUT_FORMATTER);
+        if (this.startDatetime.isAfter(endDatetime)) {
+            throw new IllegalArgumentException(
+                    "start date/time `%s` comes after end date/time `%s`".formatted(start, end));
+        }
     }
 
     public LocalDateTime getStartDatetime() {
@@ -36,6 +41,7 @@ public class EventTask extends Task {
 
     @Override
     public boolean doesOccurOn(LocalDate date) {
+        assert !this.startDatetime.isAfter(this.endDatetime);
         // event occurs on that datetime iff start <= datetime <= end
         LocalDate startDate = startDatetime.toLocalDate();
         boolean isTargetAfterEqStart = startDate.isBefore(date) || startDate.equals(date);

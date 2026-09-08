@@ -1,5 +1,8 @@
 package grug.task;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 /**
  * Represents the priorities of different tasks.
  */
@@ -42,6 +45,13 @@ public enum TaskPriority {
             default -> throw new IllegalArgumentException(
                     "Invalid priority name `%s`".formatted(displayName));
         };
+    }
+
+    public static List<String> getValidPriorityNames() {
+
+        return Stream.of(TaskPriority.values())
+                .map(priority -> priority.getDisplayName())
+                .toList();
     }
 
     public String getDisplayName() {

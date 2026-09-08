@@ -60,6 +60,8 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
+        assert this.grug != null : "initializeGrugBackend() must be called before handleUserInput()";
+
         String input = this.grug.readUserInput("").get();
 
         // only display the user's dialog box if its not blank

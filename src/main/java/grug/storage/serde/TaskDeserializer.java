@@ -1,9 +1,11 @@
 package grug.storage.serde;
 
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -122,7 +124,7 @@ public class TaskDeserializer {
      * @return A map of {@code property} to {@code value}.
      * @throws TaskDeserializerException If there is at least 1 malformed line.
      */
-    private static HashMap<String, String> parseBodyProperties(Iterable<String> bodyLines)
+    private static Map<String, String> parseBodyProperties(Iterable<String> bodyLines)
             throws TaskDeserializerException {
         HashMap<String, String> properties = new HashMap<>();
 
@@ -215,6 +217,15 @@ public class TaskDeserializer {
         return task;
     }
 
+    private static boolean isDateTimeTextValid(CharSequence text, DateTimeFormatter formatter) {
+        try {
+            formatter.parse(text);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
     /**
      * Converts a property:value map into a {@link TodoTask}.
      *
@@ -223,7 +234,7 @@ public class TaskDeserializer {
      * @throws TaskDeserializerException If certain properties required by the task
      *                                   are not present.
      */
-    private static TodoTask createTodoFromProperties(HashMap<String, String> properties)
+    private static TodoTask createTodoFromProperties(Map<String, String> properties)
             throws TaskDeserializerException {
         // empty string if details not provided
         String details = properties.get("details");
@@ -248,7 +259,7 @@ public class TaskDeserializer {
      * @throws TaskDeserializerException If certain properties required by the task
      *                                   are not present.
      */
-    private static DeadlineTask createDeadlineFromProperties(HashMap<String, String> properties)
+    private static DeadlineTask createDeadlineFromProperties(Map<String, String> properties)
             throws TaskDeserializerException {
         // empty string if details not provided
         String details = properties.get("details");
@@ -285,7 +296,7 @@ public class TaskDeserializer {
      * @throws TaskDeserializerException If certain properties required by the task
      *                                   are not present.
      */
-    private static EventTask createEventFromProperties(HashMap<String, String> properties)
+    private static EventTask createEventFromProperties(Map<String, String> properties)
             throws TaskDeserializerException {
         // empty string if details not provided
         String details = properties.get("details");
@@ -303,22 +314,19 @@ public class TaskDeserializer {
             throw new TaskDeserializerException("[event] task requires non-empty `end` property");
         }
 
-        try {
-            EventTask.DATE_TIME_INPUT_FORMATTER.parse(start);
-        } catch (DateTimeParseException e) {
+        // we are validating start and end here instead of catching the error from
+        // EventTask constructor to have appropriate error messages for start and end,
+        // rather than lumping them together
+        if (!isDateTimeTextValid(start, EventTask.DATE_TIME_INPUT_FORMATTER)) {
             throw new TaskDeserializerException(
                     "[event] property start = `%s` does not match format `%s`"
-                            .formatted(start, EventTask.DATE_TIME_INPUT_PATTERN),
-                    e);
+                            .formatted(start, EventTask.DATE_TIME_INPUT_PATTERN));
         }
 
-        try {
-            EventTask.DATE_TIME_INPUT_FORMATTER.parse(end);
-        } catch (DateTimeParseException e) {
+        if (!isDateTimeTextValid(end, EventTask.DATE_TIME_INPUT_FORMATTER)) {
             throw new TaskDeserializerException(
                     "[event] property end = `%s` does not match format `%s`"
-                            .formatted(end, EventTask.DATE_TIME_INPUT_PATTERN),
-                    e);
+                            .formatted(end, EventTask.DATE_TIME_INPUT_PATTERN));
         }
 
         // guaranteed not to throw DateTimeParseException now that we validated start

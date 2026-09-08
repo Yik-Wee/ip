@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.Task;
+import grug.task.TaskPriority;
 import grug.task.TodoTask;
 
 /**
@@ -227,6 +228,27 @@ public class TaskDeserializer {
     }
 
     /**
+     * Retrieves the "priority" property from the serialized {@code properties}.
+     *
+     * Returns the appropriate {@link TaskPriority} enum if valid priority provided,
+     * or {@link TaskPriority#DEFAULT} otherwise.
+     *
+     * @param properties The map of property to value.
+     * @return The appropriate {@link TaskPriority} enum if a valid priority was
+     *         found, or {@link TaskPriority#DEFAULT} otherwise.
+     */
+    private static TaskPriority parsePriorityFromProperties(Map<String, String> properties) {
+        String priorityDisplayName = properties.get("priority");
+
+        // the null case ("priority" property doesn't exist) is handled here too
+        try {
+            return TaskPriority.createFromDisplayName(priorityDisplayName);
+        } catch (IllegalArgumentException e) {
+            return TaskPriority.DEFAULT;
+        }
+    }
+
+    /**
      * Converts a property:value map into a {@link TodoTask}.
      *
      * @param properties The property:value map to convert.
@@ -242,7 +264,9 @@ public class TaskDeserializer {
             throw new TaskDeserializerException("[todo] task requires non-empty `details` property");
         }
 
+        TaskPriority priority = parsePriorityFromProperties(properties);
         TodoTask task = new TodoTask(details);
+        task.setPriority(priority);
 
         // only set isCompleted to true if `completed = 1`
         if ("1".equals(properties.get("completed"))) {
@@ -272,20 +296,24 @@ public class TaskDeserializer {
             throw new TaskDeserializerException("[deadline] task requires non-empty `by` property");
         }
 
-        try {
-            DeadlineTask task = new DeadlineTask(details, by);
+        TaskPriority priority = parsePriorityFromProperties(properties);
 
-            // only set isCompleted to true if `completed = 1`
-            if ("1".equals(properties.get("completed"))) {
-                task.markComplete();
-            }
-            return task;
+        DeadlineTask task;
+        try {
+            task = new DeadlineTask(details, by);
         } catch (DateTimeParseException e) {
             throw new TaskDeserializerException(
                     "[deadline] property by = `%s` does not match format `%s`"
                             .formatted(by, DeadlineTask.DATE_TIME_INPUT_PATTERN),
                     e);
         }
+
+        // only set isCompleted to true if `completed = 1`
+        if ("1".equals(properties.get("completed"))) {
+            task.markComplete();
+        }
+        task.setPriority(priority);
+        return task;
     }
 
     /**
@@ -313,6 +341,8 @@ public class TaskDeserializer {
         if (end == null) {
             throw new TaskDeserializerException("[event] task requires non-empty `end` property");
         }
+
+        TaskPriority priority = parsePriorityFromProperties(properties);
 
         // we are validating start and end here instead of catching the error from
         // EventTask constructor to have appropriate error messages for start and end,
@@ -345,6 +375,7 @@ public class TaskDeserializer {
         if ("1".equals(properties.get("completed"))) {
             task.markComplete();
         }
+        task.setPriority(priority);
         return task;
     }
 }

@@ -59,11 +59,13 @@ public class TaskSerializer {
     public static String serialize(TodoTask task) {
         String completed = task.isCompleted() ? "1" : "0";
         String details = task.getDetails().replace("\n", "\\n");
+        String priority = task.getPriority().getDisplayName();
         return """
                 [todo]
                 completed = %s
                 details = %s
-                """.formatted(completed, details);
+                priority = %s
+                """.formatted(completed, details, priority);
     }
 
     /**
@@ -83,12 +85,14 @@ public class TaskSerializer {
         String completed = task.isCompleted() ? "1" : "0";
         String details = task.getDetails().replace("\n", "\\n");
         String by = task.getDeadlineDatetime().format(DeadlineTask.DATE_TIME_INPUT_FORMATTER);
+        String priority = task.getPriority().getDisplayName();
         return """
                 [deadline]
                 completed = %s
                 details = %s
                 by = %s
-                """.formatted(completed, details, by);
+                priority = %s
+                """.formatted(completed, details, by, priority);
     }
 
     /**
@@ -110,13 +114,14 @@ public class TaskSerializer {
         String details = task.getDetails().replace("\n", "\\n");
         String start = task.getStartDatetime().format(EventTask.DATE_TIME_INPUT_FORMATTER);
         String end = task.getEndDatetime().format(EventTask.DATE_TIME_INPUT_FORMATTER);
-
+        String priority = task.getPriority().getDisplayName();
         return """
                 [event]
                 completed = %s
                 details = %s
                 start = %s
                 end = %s
-                """.formatted(completed, details, start, end);
+                priority = %s
+                """.formatted(completed, details, start, end, priority);
     }
 }

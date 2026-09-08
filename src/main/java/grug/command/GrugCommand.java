@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 import grug.storage.TaskStorage;
 import grug.task.Task;
 import grug.task.TaskList;
+import grug.task.TaskPriority;
 
 /**
  * Algebraic Data Type that represents the user's command.
@@ -325,6 +326,55 @@ public sealed interface GrugCommand {
             }
 
             return new CommandResult.Ok(msg.toString().stripTrailing(), false);
+        }
+    }
+
+    /**
+     * Command to set / update the priority of the {@code tasknum}-th (1-based)
+     * task.
+     *
+     * @param taskNum     The 1-based position of the task in the task list.
+     * @param newPriority The new priority of the task.
+     */
+    record SetPriorityCommand(int taskNum, TaskPriority newPriority) implements GrugCommand {
+        /**
+         * Unmarks the {@link #taskNum()}-th task (1-based) as incomplete, then attempts
+         * to save the list to disk.
+         *
+         * @param tasks   The task list to modify.
+         * @param storage The task storage to save to.
+         * @return A {@link CommandResult.Err} if index is out of range, with
+         *         appropriate error {@code message} and {@code shouldExit: false}.
+         *
+         *         Else, a {@link CommandResult.Partial} if tasks failed to be
+         *         saved to the {@code storage}, with {@code message} containing the
+         *         updated task and the appropriate error message, and
+         *         {@code shouldExit: false}.
+         *
+         *         Else, A {@link CommandResult.Ok} if both operations successful.
+         */
+
+        @Override
+        public CommandResult execute(TaskList tasks, TaskStorage storage) {
+            int taskIdx = taskNum - 1;
+            Optional<Task> taskOptional = tasks.getTask(taskIdx);
+            if (taskOptional.isEmpty()) {
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
+            }
+
+            Task task = taskOptional.get();
+            task.setPriority(newPriority);
+
+            StringBuilder msg = new StringBuilder();
+            msg.append("Updated task %d: %s".formatted(taskNum, task));
+
+            try {
+                storage.saveTasks(tasks.getTasks());
+                return new CommandResult.Ok(msg.toString(), false);
+            } catch (IOException e) {
+                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
+                return new CommandResult.Partial(msg.toString(), false);
+            }
         }
     }
 

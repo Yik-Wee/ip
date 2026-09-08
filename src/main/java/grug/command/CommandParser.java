@@ -118,6 +118,7 @@ public class CommandParser {
         // input must have had a non-whitespace character, so splitting it must give an
         // array with at least length 1, so args[0] will not throw
         String[] args = input.split("\\s+");
+        assert args.length > 0;
         String commandString = args[0].toLowerCase();
 
         return switch (commandString) {

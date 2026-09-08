@@ -107,6 +107,9 @@ public class TaskDeserializer {
 
         // guaranteed not to throw since there is exactly 1 capture group (apart from
         // the entire matching subsequence) if found
+        // note: group 0 is not included in groupCount(), but is included in group()
+        assert matcher.groupCount() == 1
+                : "The serialized task is valid, but does not contain exactly 1 capture group";
         return matcher.group(1).toLowerCase();
     }
 

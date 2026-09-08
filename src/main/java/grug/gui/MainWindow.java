@@ -42,6 +42,11 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     public void initialize() {
+        assert scrollPane != null : "MainWindow fxml does not inject `scrollPane`";
+        assert dialogContainer != null : "MainWindow fxml does not inject `dialogContainer`";
+        assert userInput != null : "MainWindow fxml does not inject `userInput`";
+        assert sendButton != null : "MainWindow fxml does not inject `sendButton`";
+
         // scroll to the bottom when vbox height changes
         this.dialogContainer.heightProperty().addListener((observable, oldHeight, newHeight) -> {
             this.scrollPane.setVvalue(this.scrollPane.getVmax());

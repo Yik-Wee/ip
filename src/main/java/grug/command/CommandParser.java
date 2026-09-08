@@ -121,17 +121,20 @@ public class CommandParser {
      * the appropriate {@link TaskPriority} variant.
      *
      * @param parsedArgs The parsed arguments from the user input.
+     * @param default    The default priority if no {@code /priority}
+     *                   was given.
      * @return The appropriate {@link TaskPriority} variant based on the
      *         {@code /priority} flag's value if it was given,
-     *         {@link TaskPriority#DEFAULT} if no {@code /priority} was given.
+     *         {@code default} if no {@code /priority} was given.
      * @throws GrugCommandParserException If the number of non-empty
      *                                    {@code /priority} flags given is not
      *                                    exactly 1, or the priority is invalid.
      */
-    private static TaskPriority parseTaskPriorityFrom(ParsedArgs parsedArgs) throws GrugCommandParserException {
+    private static TaskPriority parseTaskPriorityFrom(ParsedArgs parsedArgs, TaskPriority defaultPriority)
+            throws GrugCommandParserException {
         List<String> priorities = parsedArgs.flagValues().get("/priority");
         if (priorities == null) {
-            return TaskPriority.DEFAULT;
+            return defaultPriority;
         }
 
         if (priorities.isEmpty()) {
@@ -187,7 +190,8 @@ public class CommandParser {
             case "event" -> parseEventCommand(args);
             case "delete" -> parseDeleteCommand(args);
             case "find-on" -> parseFindByDateCommand(args);
-            case "find" -> parseFindByDetails(args);
+            case "find" -> parseFindByDetailsCommand(args);
+            case "set-priority" -> parseSetPriorityCommand(args);
             default -> throw new GrugCommandParserException.UnknownCommand(commandString);
         };
     }
@@ -260,7 +264,7 @@ public class CommandParser {
         }
 
         String details = String.join(" ", parsedArgs.inputs());
-        TaskPriority priority = parseTaskPriorityFrom(parsedArgs);
+        TaskPriority priority = parseTaskPriorityFrom(parsedArgs, TaskPriority.DEFAULT);
 
         TodoTask todoTask = new TodoTask(details);
         todoTask.setPriority(priority);
@@ -290,7 +294,7 @@ public class CommandParser {
 
         String details = String.join(" ", parsedArgs.inputs());
         String deadline = String.join(" ", parsedArgs.flagValues().get("/by"));
-        TaskPriority priority = parseTaskPriorityFrom(parsedArgs);
+        TaskPriority priority = parseTaskPriorityFrom(parsedArgs, TaskPriority.DEFAULT);
 
         try {
             DeadlineTask deadlineTask = new DeadlineTask(details, deadline);
@@ -325,7 +329,7 @@ public class CommandParser {
         String details = String.join(" ", parsedArgs.inputs());
         String from = String.join(" ", parsedArgs.flagValues().get("/from"));
         String to = String.join(" ", parsedArgs.flagValues().get("/to"));
-        TaskPriority priority = parseTaskPriorityFrom(parsedArgs);
+        TaskPriority priority = parseTaskPriorityFrom(parsedArgs, TaskPriority.DEFAULT);
 
         try {
             EventTask eventTask = new EventTask(details, from, to);
@@ -467,7 +471,7 @@ public class CommandParser {
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.FindTasksByDetailsCommand parseFindByDetails(String[] args)
+    private static GrugCommand.FindTasksByDetailsCommand parseFindByDetailsCommand(String[] args)
             throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
@@ -478,5 +482,39 @@ public class CommandParser {
         String details = String.join(" ", parsedArgs.inputs());
 
         return new GrugCommand.FindTasksByDetailsCommand(details);
+    }
+
+    /**
+     * Parses the argument list `args`.
+     *
+     * @param args The list of arguments read from the input, including the initial
+     *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
+     * @return A new {@link GrugCommand.SetPriorityCommand} command instance.
+     * @throws GrugCommandParserException If something went wrong parsing the args.
+     * @throws IllegalArgumentException   If args is empty.
+     */
+    private static GrugCommand.SetPriorityCommand parseSetPriorityCommand(String[] args)
+            throws GrugCommandParserException {
+        requireNonEmptyArgs(args);
+
+        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
+
+        TaskPriority newPriority = parseTaskPriorityFrom(parsedArgs, null);
+        if (parsedArgs.inputs().size() != 1 || newPriority == null) {
+            String usage = "set-priority <tasknum> /priority <opt|low|med|hig|urg>";
+            System.out.println(parsedArgs);
+            throw new GrugCommandParserException.InvalidUsage(usage);
+        }
+
+        String taskNumText = parsedArgs.inputs().get(0);
+        int taskNum;
+        try {
+            taskNum = Integer.parseInt(taskNumText);
+        } catch (NumberFormatException e) {
+            String reason = "tasknum %s is not an integer".formatted(taskNumText);
+            throw new GrugCommandParserException.InvalidArgument("set-priority <tasknum>", reason);
+        }
+
+        return new GrugCommand.SetPriorityCommand(taskNum, newPriority);
     }
 }

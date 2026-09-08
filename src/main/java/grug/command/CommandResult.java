@@ -21,6 +21,14 @@ public sealed interface CommandResult {
      * @param shouldExit Whether the command loop should exit.
      */
     record Ok(String message, boolean shouldExit) implements CommandResult {
+        /**
+         * Constructs an {@code Ok} result, where {@code shouldExit} is {@code false}.
+         *
+         * @param message The success message.
+         */
+        public Ok(String message) {
+            this(message, false);
+        }
     }
 
     /**
@@ -30,6 +38,14 @@ public sealed interface CommandResult {
      * @param shouldExit Whether the command loop should exit.
      */
     record Err(String message, boolean shouldExit) implements CommandResult {
+        /**
+         * Constructs an {@code Err} result, where {@code shouldExit} is {@code false}.
+         *
+         * @param message The error message.
+         */
+        public Err(String message) {
+            this(message, false);
+        }
     }
 
     /**
@@ -40,5 +56,14 @@ public sealed interface CommandResult {
      * @param shouldExit Whether the command loop should exit.
      */
     record Partial(String message, boolean shouldExit) implements CommandResult {
+        /**
+         * Constructs a {@code Partial} result, where {@code shouldExit} is
+         * {@code false}.
+         *
+         * @param message The partial success message.
+         */
+        public Partial(String message) {
+            this(message, false);
+        }
     }
 }

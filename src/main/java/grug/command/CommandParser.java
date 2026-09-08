@@ -277,6 +277,10 @@ public class CommandParser {
             throw new GrugCommandParserException.InvalidArgument(
                     "from / to",
                     "must be in the format " + EventTask.DATE_TIME_INPUT_PATTERN);
+        } catch (IllegalArgumentException e) {
+            throw new GrugCommandParserException.InvalidArgument(
+                    "from / to",
+                    "from date/time `%s` must not occur after to date/time `%s`".formatted(from, to));
         }
     }
 

@@ -1,7 +1,9 @@
 package grug.task;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -66,5 +68,26 @@ class TaskTest {
         assertTrue(task.doesOccurOn(LocalDate.of(2026, 12, 27)));
         assertFalse(task.doesOccurOn(LocalDate.of(2026, 12, 24)));
         assertFalse(task.doesOccurOn(LocalDate.of(2026, 12, 28)));
+    }
+
+    @Test
+    void eventTask_startAfterEnd_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new EventTask("(invalid) start AFTER end", "12-25", "12-24");
+        });
+    }
+
+    @Test
+    void eventTask_startEqualsEnd_doesNotThrow() {
+        assertDoesNotThrow(() -> new EventTask("start == end", "2000-12-25", "2000-12-25"));
+    }
+
+    @Test
+    void eventTask_doesOccurOn_startEqualsEnd() {
+        EventTask eventTask = new EventTask("start == end", "2000-12-25", "2000-12-25");
+        assertTrue(eventTask.doesOccurOn(LocalDate.of(2000, 12, 25)));
+        assertFalse(eventTask.doesOccurOn(LocalDate.of(2000, 12, 24)));
+        assertFalse(eventTask.doesOccurOn(LocalDate.of(2000, 12, 26)));
+        assertFalse(eventTask.doesOccurOn(LocalDate.of(1999, 12, 25)));
     }
 }

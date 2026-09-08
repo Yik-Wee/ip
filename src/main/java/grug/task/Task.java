@@ -24,6 +24,7 @@ public abstract class Task {
 
     private String details;
     private boolean isCompleted;
+    private TaskPriority priority;
 
     /**
      * Creates a new *incomplete* `Task`.
@@ -41,8 +42,20 @@ public abstract class Task {
      * @param isCompleted whether the task has been completed.
      */
     public Task(String details, boolean isCompleted) {
+        this(details, isCompleted, TaskPriority.DEFAULT);
+    }
+
+    /**
+     * Creates a new `Task`.
+     *
+     * @param details     the details of the task.
+     * @param isCompleted whether the task has been completed.
+     * @param priority    the priority of the task.
+     */
+    public Task(String details, boolean isCompleted, TaskPriority priority) {
         this.details = details;
         this.isCompleted = isCompleted;
+        this.priority = priority;
     }
 
     /**
@@ -65,6 +78,14 @@ public abstract class Task {
 
     public boolean isCompleted() {
         return this.isCompleted;
+    }
+
+    public TaskPriority getPriority() {
+        return this.priority;
+    }
+
+    public void setPriority(TaskPriority priority) {
+        this.priority = priority;
     }
 
     /**

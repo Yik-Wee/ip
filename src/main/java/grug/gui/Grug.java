@@ -128,6 +128,10 @@ public class Grug {
                 ui.displayWarning(message);
                 return shouldExit;
             }
+            default -> {
+                // should never happen
+                throw new IllegalStateException("Unknown CommandResult variant");
+            }
         }
     }
 

@@ -47,8 +47,8 @@ public class CommandParser {
     }
 
     /**
-     * Parses the list of args into the command, inputs and flag values, based on
-     * the {@code flags} given.
+     * Parses the list of args into the command, inputs and flag values. Flags start
+     * with {@code /}.
      *
      * e.g.
      *
@@ -74,9 +74,7 @@ public class CommandParser {
      * appear in {@code args[]}, and guaranteed to be an empty list if the flag
      * appeared without declaring its values, e.g. {@code cmd something /flag}
      *
-     * @param args  The args to parse.
-     * @param flags The flags we want to obtain the values of (e.g.
-     *              {@code Set.of("/start", "/end")}).
+     * @param args The args to parse.
      * @return {@link ParsedArgs} The command, inputs and flag values.
      */
     private static ParsedArgs parseArgs(String[] args) {
@@ -137,8 +135,10 @@ public class CommandParser {
             return defaultPriority;
         }
 
+        String priorityFlagOptions = getPriorityFlagOptions(" | ");
+
         if (priorities.isEmpty()) {
-            String reason = "No priority specified. priority must be one of <opt | low | med | hig | urg>";
+            String reason = "No priority specified. priority must be one of " + priorityFlagOptions;
             throw new GrugCommandParserException.InvalidArgument("/priority", reason);
         }
 
@@ -152,9 +152,17 @@ public class CommandParser {
         try {
             return TaskPriority.createFromDisplayName(priorityName);
         } catch (IllegalArgumentException e) {
-            String reason = "priority must be one of <opt | low | med | hig | urg>";
+            String reason = "priority must be one of " + priorityFlagOptions;
             throw new GrugCommandParserException.InvalidArgument("/priority", reason);
         }
+    }
+
+    private static String getPriorityFlagUsage() {
+        return "/priority " + getPriorityFlagOptions(" | ");
+    }
+
+    private static String getPriorityFlagOptions(String delimiter) {
+        return String.join(delimiter, TaskPriority.getValidPriorityNames());
     }
 
     /**
@@ -260,7 +268,8 @@ public class CommandParser {
 
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
         if (parsedArgs.inputs().isEmpty()) {
-            throw new GrugCommandParserException.InvalidUsage("todo <details> [/priority opt|low|med|hig|urg]");
+            throw new GrugCommandParserException.InvalidUsage(
+                    "todo <details> [%s]".formatted(getPriorityFlagUsage()));
         }
 
         String details = String.join(" ", parsedArgs.inputs());
@@ -345,6 +354,28 @@ public class CommandParser {
     }
 
     /**
+     * Converts the {@code text} into an integer.
+     *
+     * @param text           The text to convert into an integer.
+     * @param erraticCommand The command that we are passing the integer to.
+     * @param errorReason    The reason for if there is a parsing error.
+     * @return The parsed integer.
+     * @throws GrugCommandParserException.InvalidArgument Containing the
+     *                                                    {@code erraticCommand} and
+     *                                                    {@code errorReason} if we
+     *                                                    could not parse the
+     *                                                    integer
+     */
+    private static int parseInt(String text, String erraticCommand, String errorReason)
+            throws GrugCommandParserException {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            throw new GrugCommandParserException.InvalidArgument(erraticCommand, errorReason);
+        }
+    }
+
+    /**
      * Parses the argument list `args`.
      *
      * @param args The list of arguments read from the input, including the initial
@@ -362,13 +393,7 @@ public class CommandParser {
         }
 
         String taskNumText = args[1];
-        int taskNum;
-        try {
-            taskNum = Integer.parseInt(taskNumText);
-        } catch (NumberFormatException e) {
-            String reason = "tasknum must be an integer";
-            throw new GrugCommandParserException.InvalidArgument("mark <tasknum>", reason);
-        }
+        int taskNum = parseInt(taskNumText, "mark <tasknum>", "tasknum must be an integer");
         return new GrugCommand.MarkTaskCommand(taskNum);
     }
 
@@ -391,13 +416,7 @@ public class CommandParser {
         }
 
         String taskNumText = args[1];
-        int taskNum;
-        try {
-            taskNum = Integer.parseInt(taskNumText);
-        } catch (NumberFormatException e) {
-            String reason = "tasknum must be an integer";
-            throw new GrugCommandParserException.InvalidArgument("unmark <tasknum>", reason);
-        }
+        int taskNum = parseInt(taskNumText, "unmark <tasknum>", "tasknum must be an integer");
         return new GrugCommand.UnmarkTaskCommand(taskNum);
     }
 
@@ -419,13 +438,7 @@ public class CommandParser {
         }
 
         String taskNumText = args[1];
-        int taskNum;
-        try {
-            taskNum = Integer.parseInt(taskNumText);
-        } catch (NumberFormatException e) {
-            String reason = "tasknum must be an integer";
-            throw new GrugCommandParserException.InvalidArgument("delete <tasknum>", reason);
-        }
+        int taskNum = parseInt(taskNumText, "delete <tasknum>", "tasknum must be an integer");
         return new GrugCommand.DeleteTaskCommand(taskNum);
     }
 
@@ -501,19 +514,14 @@ public class CommandParser {
 
         TaskPriority newPriority = parseTaskPriorityFrom(parsedArgs, null);
         if (parsedArgs.inputs().size() != 1 || newPriority == null) {
-            String usage = "set-priority <tasknum> /priority <opt|low|med|hig|urg>";
+            String usage = "set-priority <tasknum> " + getPriorityFlagUsage();
             System.out.println(parsedArgs);
             throw new GrugCommandParserException.InvalidUsage(usage);
         }
 
         String taskNumText = parsedArgs.inputs().get(0);
-        int taskNum;
-        try {
-            taskNum = Integer.parseInt(taskNumText);
-        } catch (NumberFormatException e) {
-            String reason = "tasknum %s is not an integer".formatted(taskNumText);
-            throw new GrugCommandParserException.InvalidArgument("set-priority <tasknum>", reason);
-        }
+        String errorReason = "tasknum %s is not an integer".formatted(taskNumText);
+        int taskNum = parseInt(taskNumText, "set-priority <tasknum>", errorReason);
 
         return new GrugCommand.SetPriorityCommand(taskNum, newPriority);
     }

@@ -29,7 +29,7 @@ public sealed interface GrugCommand {
          */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
-            return new CommandResult.Ok("", false);
+            return new CommandResult.Ok("");
         }
     }
 
@@ -47,7 +47,8 @@ public sealed interface GrugCommand {
          */
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
-            return new CommandResult.Ok("Unga. Bye. さよなら", true);
+            boolean shouldExit = true;
+            return new CommandResult.Ok("Unga. Bye. さよなら", shouldExit);
         }
     }
 
@@ -67,14 +68,14 @@ public sealed interface GrugCommand {
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             if (tasks.isEmpty()) {
-                return new CommandResult.Ok("No tasks added.", false);
+                return new CommandResult.Ok("No tasks added.");
             }
 
             String msg = IntStream.range(0, tasks.getSize())
                     .mapToObj(i -> "%d. %s".formatted(i + 1, tasks.getTaskUnchecked(i)))
                     .collect(Collectors.joining("\n"));
 
-            return new CommandResult.Ok(msg, false);
+            return new CommandResult.Ok(msg);
         }
     }
 
@@ -101,16 +102,8 @@ public sealed interface GrugCommand {
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("added: ").append(task);
-
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString(), false);
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString(), false);
-            }
+            String msg = "added: " + task;
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -143,22 +136,15 @@ public sealed interface GrugCommand {
             // empty optional if index out of bounds
             Optional<Task> optionalTask = tasks.getTask(taskIdx);
             if (optionalTask.isEmpty()) {
-                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum));
             }
 
             Task task = optionalTask.get();
             task.markComplete();
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("Updated task %d: %s".formatted(taskNum, task));
+            String msg = "Updated task %d: %s".formatted(taskNum, task);
 
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString(), false);
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString(), false);
-            }
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -191,22 +177,15 @@ public sealed interface GrugCommand {
             // empty optional if index out of bounds
             Optional<Task> optionalTask = tasks.getTask(taskIdx);
             if (optionalTask.isEmpty()) {
-                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum));
             }
 
             Task task = optionalTask.get();
             task.markIncomplete();
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("Updated task %d: %s".formatted(taskNum, task));
+            String msg = "Updated task %d: %s".formatted(taskNum, task);
 
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString(), false);
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString(), false);
-            }
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -236,21 +215,14 @@ public sealed interface GrugCommand {
             // empty optional if index out of bounds
             Optional<Task> optionalRemoved = tasks.removeTask(taskIdx);
             if (optionalRemoved.isEmpty()) {
-                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum));
             }
 
             Task removedTask = optionalRemoved.get();
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("deleted: %s".formatted(removedTask));
+            String msg = "deleted: %s".formatted(removedTask);
 
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString(), false);
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString(), false);
-            }
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -273,7 +245,7 @@ public sealed interface GrugCommand {
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             if (tasks.isEmpty()) {
-                return new CommandResult.Ok("No tasks added.", false);
+                return new CommandResult.Ok("No tasks added.");
             }
 
             String msg = IntStream.range(0, tasks.getSize())
@@ -282,10 +254,10 @@ public sealed interface GrugCommand {
                     .collect(Collectors.joining("\n"));
 
             if (msg.isEmpty()) {
-                return new CommandResult.Ok("No tasks occuring on that date", false);
+                return new CommandResult.Ok("No tasks occuring on that date");
             }
 
-            return new CommandResult.Ok(msg.toString().stripTrailing(), false);
+            return new CommandResult.Ok(msg.toString().stripTrailing());
         }
     }
 
@@ -312,7 +284,7 @@ public sealed interface GrugCommand {
         @Override
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             if (tasks.isEmpty()) {
-                return new CommandResult.Ok("No tasks added.", false);
+                return new CommandResult.Ok("No tasks added.");
             }
 
             String targetLower = detailsSubstring.strip().replaceAll("\\s+", " ").toLowerCase();
@@ -322,10 +294,10 @@ public sealed interface GrugCommand {
                     .collect(Collectors.joining("\n"));
 
             if (msg.isEmpty()) {
-                return new CommandResult.Ok("No matching tasks found.", false);
+                return new CommandResult.Ok("No matching tasks found.");
             }
 
-            return new CommandResult.Ok(msg.toString().stripTrailing(), false);
+            return new CommandResult.Ok(msg.toString().stripTrailing());
         }
     }
 
@@ -359,22 +331,14 @@ public sealed interface GrugCommand {
             int taskIdx = taskNum - 1;
             Optional<Task> taskOptional = tasks.getTask(taskIdx);
             if (taskOptional.isEmpty()) {
-                return new CommandResult.Err("Can't find task number %d".formatted(taskNum), false);
+                return new CommandResult.Err("Can't find task number %d".formatted(taskNum));
             }
 
             Task task = taskOptional.get();
             task.setPriority(newPriority);
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("Updated task %d: %s".formatted(taskNum, task));
-
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString(), false);
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString(), false);
-            }
+            String msg = "Updated task %d: %s".formatted(taskNum, task);
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -395,4 +359,30 @@ public sealed interface GrugCommand {
      *         command loop should exit.
      */
     public abstract CommandResult execute(TaskList tasks, TaskStorage storage);
+
+    /**
+     * Attempts to save the tasks to the storage, but if it fails, returns a
+     * *Partial* success (not an Err).
+     *
+     * The reason why we return a *Partial* success instead of an Err is because
+     * this method is meant to be called at the end of a successful execution. If
+     * saving tasks fails, the primary result of the execution is thus still
+     * successful, so the execution is overall *partially* successful.
+     *
+     * @param tasks          The tasks to save.
+     * @param storage        The storage to save to.
+     * @param accumulatedMsg The existing messages that have been accumulated.
+     * @return {@link CommandResult.Ok} if successful, or
+     *         {@link CommandResult.Partial} with an appended error message if
+     *         unsuccessful.
+     */
+    private static CommandResult saveTasksPostExecution(TaskList tasks, TaskStorage storage, String accumulatedMsg) {
+        try {
+            storage.saveTasks(tasks.getTasks());
+            return new CommandResult.Ok(accumulatedMsg);
+        } catch (IOException e) {
+            String partialResultMessage = accumulatedMsg + "\nFailed to save tasks to " + storage.getFilepath();
+            return new CommandResult.Partial(partialResultMessage);
+        }
+    }
 }

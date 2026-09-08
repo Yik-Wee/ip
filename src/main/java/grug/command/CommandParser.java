@@ -36,15 +36,12 @@ public class CommandParser {
          * @return {@code true} if {@code flagValues} contains all required flags whose
          *         values are non-empty, {@code false} otherwise.
          */
-        public boolean hasNonEmptyFlagValues(Iterable<String> requiredFlags) {
-            for (String flag : requiredFlags) {
-                List<String> value = flagValues.get(flag);
-                if (value == null || value.isEmpty()) {
-                    return false;
-                }
-            }
-
-            return true;
+        public boolean hasNonEmptyFlagValues(Collection<String> requiredFlags) {
+            boolean areAllValuesNonEmpty = requiredFlags
+                    .stream()
+                    .map(flagValues::get)
+                    .allMatch(values -> values != null && !values.isEmpty());
+            return areAllValuesNonEmpty;
         }
     }
 

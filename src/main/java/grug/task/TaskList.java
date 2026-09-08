@@ -77,6 +77,17 @@ public class TaskList {
     }
 
     /**
+     * Gets the task from the task list without checking that index is in range.
+     *
+     * @param index The index of the task.
+     * @return The task at the given {@code index}.
+     * @throws IndexOutOfBoundsException If the index is out of bounds.
+     */
+    public Task getTaskUnchecked(int index) {
+        return this.tasks.get(index);
+    }
+
+    /**
      * Checks whether the given index is in the range of the task list.
      *
      * @param index The index to check.

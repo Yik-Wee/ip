@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import grug.storage.serde.TaskDeserializer;
 import grug.storage.serde.TaskDeserializerException;
@@ -43,16 +44,13 @@ public final class TaskStorage {
     public void saveTasks(List<Task> tasks) throws IOException {
         // the writer is automatically closed at the end of this try-resource block
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.filepath))) {
-            // we expect at most around 100 tasks, so it is easier to just replace the
-            // contents of the entire file every save, rather than appending or deleting
-            // based on some diffs / operations, which requires more complexity
-            StringBuilder contents = new StringBuilder();
-            for (Task task : tasks) {
-                String serialized = TaskSerializer.serialize(task);
-                contents.append(serialized).append("\n");
-            }
+            // replace the contents of the entire file every save, rather than modify based
+            // on some diffs (which is unnecessarily complex)
+            String contents = tasks.stream()
+                    .map(TaskSerializer::serialize)
+                    .collect(Collectors.joining(System.lineSeparator()));
 
-            bufferedWriter.write(contents.toString());
+            bufferedWriter.write(contents);
         }
     }
 

@@ -100,6 +100,7 @@ public abstract class Task {
     @Override
     public String toString() {
         String checkbox = this.isCompleted ? "[X]" : "[ ]";
-        return "%s %s".formatted(checkbox, details);
+        String priorityBox = "[" + this.priority.getDisplayName() + "]";
+        return "%s%s %s".formatted(checkbox, priorityBox, details);
     }
 }

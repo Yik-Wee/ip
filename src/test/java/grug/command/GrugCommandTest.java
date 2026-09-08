@@ -50,7 +50,7 @@ class GrugCommandTest {
 
         assertEquals(new CommandResult.Ok("No tasks added.", false),
                 new GrugCommand.ListTasksCommand().execute(emptyTasks, storage));
-        assertEquals(new CommandResult.Ok("1. [T][ ] buy milk", false),
+        assertEquals(new CommandResult.Ok("1. [T][ ][MED] buy milk", false),
                 new GrugCommand.ListTasksCommand().execute(populatedTasks, storage));
     }
 
@@ -131,8 +131,8 @@ class GrugCommandTest {
                 .execute(tasks, createTempStorage());
 
         assertEquals(new CommandResult.Ok(
-                "2. [D][ ] deadline (by: Dec 25 2026 1700)\n"
-                        + "3. [E][ ] event (from: Dec 24 2026 1000 | to: Dec 26 2026 1100)",
+                "2. [D][ ][MED] deadline (by: Dec 25 2026 1700)\n"
+                        + "3. [E][ ][MED] event (from: Dec 24 2026 1000 | to: Dec 26 2026 1100)",
                 false), result);
     }
 
@@ -146,7 +146,7 @@ class GrugCommandTest {
         CommandResult actualResult = new GrugCommand.FindTasksByDetailsCommand("ead boo").execute(tasks,
                 createTempStorage());
         CommandResult expectedResult = new CommandResult.Ok(
-                "1. [T][ ] read book\n" + "2. [D][ ] pead boop (by: Dec 25 2026 1700)",
+                "1. [T][ ][MED] read book\n" + "2. [D][ ][MED] pead boop (by: Dec 25 2026 1700)",
                 false);
         assertEquals(actualResult, expectedResult);
     }
@@ -161,7 +161,7 @@ class GrugCommandTest {
         CommandResult actualResult = new GrugCommand.FindTasksByDetailsCommand(" \t ead  \n  \r\n boo\r")
                 .execute(tasks, createTempStorage());
         CommandResult expectedResult = new CommandResult.Ok(
-                "1. [T][ ] read book\n" + "2. [D][ ] pead boop (by: Dec 25 2026 1700)",
+                "1. [T][ ][MED] read book\n" + "2. [D][ ][MED] pead boop (by: Dec 25 2026 1700)",
                 false);
         assertEquals(actualResult, expectedResult);
     }

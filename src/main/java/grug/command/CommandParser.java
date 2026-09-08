@@ -12,6 +12,7 @@ import java.util.Set;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.Task;
+import grug.task.TaskPriority;
 import grug.task.TodoTask;
 
 /**
@@ -78,7 +79,7 @@ public class CommandParser {
      *              {@code Set.of("/start", "/end")}).
      * @return {@link ParsedArgs} The command, inputs and flag values.
      */
-    private static ParsedArgs parseArgs(String[] args, Collection<String> flags) {
+    private static ParsedArgs parseArgs(String[] args) {
         if (args.length == 0) {
             return new ParsedArgs("", new ArrayList<>(0), new HashMap<>(0));
         }
@@ -97,7 +98,7 @@ public class CommandParser {
         for (int i = 1; i < args.length; i++) {
             String token = args[i];
 
-            boolean isFlag = flags.contains(token);
+            boolean isFlag = token.startsWith("/");
             if (isFlag) {
                 // our token is a flag, add subsequent tokens to the flag's values
                 currentFlag = token;
@@ -113,6 +114,44 @@ public class CommandParser {
         }
 
         return new ParsedArgs(command, inputs, flagValues);
+    }
+
+    /**
+     * Retrives the value of the {@code /priority} flag passed in and parses it into
+     * the appropriate {@link TaskPriority} variant.
+     *
+     * @param parsedArgs The parsed arguments from the user input.
+     * @return The appropriate {@link TaskPriority} variant based on the
+     *         {@code /priority} flag's value if it was given,
+     *         {@link TaskPriority#DEFAULT} if no {@code /priority} was given.
+     * @throws GrugCommandParserException If the number of non-empty
+     *                                    {@code /priority} flags given is not
+     *                                    exactly 1, or the priority is invalid.
+     */
+    private static TaskPriority parseTaskPriorityFrom(ParsedArgs parsedArgs) throws GrugCommandParserException {
+        List<String> priorities = parsedArgs.flagValues().get("/priority");
+        if (priorities == null) {
+            return TaskPriority.DEFAULT;
+        }
+
+        if (priorities.isEmpty()) {
+            String reason = "No priority specified. priority must be one of <opt | low | med | hig | urg>";
+            throw new GrugCommandParserException.InvalidArgument("/priority", reason);
+        }
+
+        if (priorities.size() != 1) {
+            throw new GrugCommandParserException.InvalidArgument(
+                    "/priority", "A task can only have 1 priority");
+        }
+
+        String priorityName = priorities.get(0);
+
+        try {
+            return TaskPriority.createFromDisplayName(priorityName);
+        } catch (IllegalArgumentException e) {
+            String reason = "priority must be one of <opt | low | med | hig | urg>";
+            throw new GrugCommandParserException.InvalidArgument("/priority", reason);
+        }
     }
 
     /**
@@ -215,13 +254,17 @@ public class CommandParser {
     private static GrugCommand.AddTaskCommand parseTodoCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
-        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of());
+        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
         if (parsedArgs.inputs().isEmpty()) {
-            throw new GrugCommandParserException.InvalidUsage("todo <details>");
+            throw new GrugCommandParserException.InvalidUsage("todo <details> [/priority opt|low|med|hig|urg]");
         }
 
         String details = String.join(" ", parsedArgs.inputs());
-        return new GrugCommand.AddTaskCommand(new TodoTask(details));
+        TaskPriority priority = parseTaskPriorityFrom(parsedArgs);
+
+        TodoTask todoTask = new TodoTask(details);
+        todoTask.setPriority(priority);
+        return new GrugCommand.AddTaskCommand(todoTask);
     }
 
     /**
@@ -238,7 +281,7 @@ public class CommandParser {
         requireNonEmptyArgs(args);
 
         Collection<String> requiredFlags = Set.of("/by");
-        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, requiredFlags);
+        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
 
         if (parsedArgs.inputs().isEmpty() || !parsedArgs.hasNonEmptyFlagValues(requiredFlags)) {
             String usage = "deadline <details> /by <%s>".formatted(DeadlineTask.DATE_TIME_INPUT_PATTERN);
@@ -247,9 +290,12 @@ public class CommandParser {
 
         String details = String.join(" ", parsedArgs.inputs());
         String deadline = String.join(" ", parsedArgs.flagValues().get("/by"));
+        TaskPriority priority = parseTaskPriorityFrom(parsedArgs);
 
         try {
-            return new GrugCommand.AddTaskCommand(new DeadlineTask(details, deadline));
+            DeadlineTask deadlineTask = new DeadlineTask(details, deadline);
+            deadlineTask.setPriority(priority);
+            return new GrugCommand.AddTaskCommand(deadlineTask);
         } catch (DateTimeParseException e) {
             String reason = "deadline must be in the format " + DeadlineTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("deadline", reason);
@@ -269,7 +315,7 @@ public class CommandParser {
         requireNonEmptyArgs(args);
 
         Set<String> requiredFlags = Set.of("/from", "/to");
-        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, requiredFlags);
+        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
 
         if (parsedArgs.inputs().isEmpty() || !parsedArgs.hasNonEmptyFlagValues(requiredFlags)) {
             String usage = "event <details> /from <from> /to <to>";
@@ -279,9 +325,12 @@ public class CommandParser {
         String details = String.join(" ", parsedArgs.inputs());
         String from = String.join(" ", parsedArgs.flagValues().get("/from"));
         String to = String.join(" ", parsedArgs.flagValues().get("/to"));
+        TaskPriority priority = parseTaskPriorityFrom(parsedArgs);
 
         try {
-            return new GrugCommand.AddTaskCommand(new EventTask(details, from, to));
+            EventTask eventTask = new EventTask(details, from, to);
+            eventTask.setPriority(priority);
+            return new GrugCommand.AddTaskCommand(eventTask);
         } catch (DateTimeParseException e) {
             String reason = "must be in the format " + EventTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("from / to", reason);
@@ -395,7 +444,7 @@ public class CommandParser {
             throw new GrugCommandParserException.InvalidUsage(usage);
         }
 
-        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of());
+        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
         List<String> datetimeTokens = parsedArgs.inputs();
         String target = String.join(" ", datetimeTokens);
 
@@ -422,7 +471,7 @@ public class CommandParser {
             throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
-        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of());
+        CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
         if (parsedArgs.inputs().isEmpty()) {
             throw new GrugCommandParserException.InvalidUsage("find <details>");
         }

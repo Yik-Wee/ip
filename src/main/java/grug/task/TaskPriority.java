@@ -23,12 +23,17 @@ public enum TaskPriority {
      * Converts the {@code displayName} to the appropriate {@link TaskPriority} enum
      * variant. See {@link TaskPriority} for all valid display names.
      *
-     * @param displayName The display name of the priority to convert.
+     * @param displayName The case insensitive display name of the priority to
+     *                    convert.
      * @return The appropriate {@link TaskPriority} converted from the display name.
-     * @throws IllegalArgumentException If {@code displayName} is invalid.
+     * @throws IllegalArgumentException If {@code displayName} is null or invalid.
      */
     public static TaskPriority createFromDisplayName(String displayName) {
-        return switch (displayName) {
+        if (displayName == null) {
+            throw new IllegalArgumentException("`displayName` cannot be null");
+        }
+
+        return switch (displayName.toUpperCase()) {
             case "OPT" -> TaskPriority.OPTIONAL;
             case "LOW" -> TaskPriority.LOW;
             case "MED" -> TaskPriority.MEDIUM;

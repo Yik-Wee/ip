@@ -44,10 +44,12 @@ public class EventTask extends Task {
         assert !this.startDatetime.isAfter(this.endDatetime);
         // event occurs on that datetime iff start <= datetime <= end
         LocalDate startDate = startDatetime.toLocalDate();
-        boolean isTargetAfterEqStart = startDate.isBefore(date) || startDate.equals(date);
+        boolean isTargetOnOrAfterStart = startDate.isBefore(date) || startDate.equals(date);
+
         LocalDate endDate = endDatetime.toLocalDate();
-        boolean isTargetBeforeEqEnd = endDate.isAfter(date) || endDate.isEqual(date);
-        return isTargetAfterEqStart && isTargetBeforeEqEnd;
+        boolean isTargetOnOrBeforeEnd = endDate.isAfter(date) || endDate.isEqual(date);
+
+        return isTargetOnOrAfterStart && isTargetOnOrBeforeEnd;
     }
 
     @Override

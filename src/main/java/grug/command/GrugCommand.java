@@ -5,11 +5,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import grug.storage.TaskStorage;
-import grug.task.DeadlineTask;
-import grug.task.EventTask;
 import grug.task.Task;
 import grug.task.TaskList;
-import grug.task.TodoTask;
 
 /**
  * Algebraic Data Type that represents the user's command.
@@ -80,85 +77,13 @@ public sealed interface GrugCommand {
     }
 
     /**
-     * Command to add a todo task to the list of tasks.
-     *
-     * @param task the task to add.
-     */
-    record AddTodoTaskCommand(TodoTask task) implements GrugCommand {
-        /**
-         * Adds a new {@link TodoTask} to the tasks list, then attempts to save the save
-         * the list to disk.
-         *
-         * @param tasks   The task list to add to.
-         * @param storage The task storage to save to.
-         * @return A {@link CommandResult.Ok} whose {@code message} contains the new
-         *         task added and {@code shouldExit: false} if successfully saved to the
-         *         {@code storage}.
-         *         Otherwise, a {@link CommandResult.Partial} whose {@code message} is
-         *         the task added and the storage failure message and
-         *         {@code shouldExit: false}.
-         */
-        @Override
-        public CommandResult execute(TaskList tasks, TaskStorage storage) {
-            tasks.addTask(task);
-
-            StringBuilder msg = new StringBuilder();
-            msg.append("added: ").append(task);
-
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString(), false);
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString(), false);
-            }
-        }
-    }
-
-    /**
-     * Command to add a task with deadline to the list of tasks.
+     * Command to add a task to the list of tasks.
      *
      * @param task The task to add.
      */
-    record AddDeadlineTaskCommand(DeadlineTask task) implements GrugCommand {
+    record AddTaskCommand(Task task) implements GrugCommand {
         /**
-         * Adds a new {@link DeadlineTask} to the tasks list, then attempts to save the
-         * save the list to disk.
-         *
-         * @param tasks   The task list to add to.
-         * @param storage The task storage to save to.
-         * @return A {@link CommandResult.Ok} whose {@code message} contains the new
-         *         task added and {@code shouldExit: false} if successfully saved to the
-         *         {@code storage}.
-         *         Otherwise, a {@link CommandResult.Partial} whose {@code message} is
-         *         the task added and the storage failure message and
-         *         {@code shouldExit: false}.
-         */
-        @Override
-        public CommandResult execute(TaskList tasks, TaskStorage storage) {
-            tasks.addTask(task);
-
-            StringBuilder msg = new StringBuilder();
-            msg.append("added: ").append(task);
-
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString(), false);
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString(), false);
-            }
-        }
-    }
-
-    /**
-     * Command to add an event task with a start and end date/time.
-     *
-     * @param task The task to add.
-     */
-    record AddEventTaskCommand(EventTask task) implements GrugCommand {
-        /**
-         * Adds a new {@link EventTask} to the tasks list, then attempts to save the
+         * Adds a new {@link Task} to the tasks list, then attempts to save the
          * save the list to disk.
          *
          * @param tasks   The task list to add to.

@@ -60,10 +60,10 @@ class GrugCommandTest {
         TaskList tasks = new TaskList();
         TaskStorage storage = createTempStorage();
 
-        CommandResult todoResult = new GrugCommand.AddTodoTaskCommand(new TodoTask("todo")).execute(tasks, storage);
-        CommandResult deadlineResult = new GrugCommand.AddDeadlineTaskCommand(
+        CommandResult todoResult = new GrugCommand.AddTaskCommand(new TodoTask("todo")).execute(tasks, storage);
+        CommandResult deadlineResult = new GrugCommand.AddTaskCommand(
                 new DeadlineTask("deadline", "2026-12-25 17:00")).execute(tasks, storage);
-        CommandResult eventResult = new GrugCommand.AddEventTaskCommand(
+        CommandResult eventResult = new GrugCommand.AddTaskCommand(
                 new EventTask("event", "2026-12-25 10:00", "2026-12-25 11:00")).execute(tasks, storage);
 
         assertInstanceOf(CommandResult.Ok.class, todoResult);

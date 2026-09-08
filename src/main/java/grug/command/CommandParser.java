@@ -215,7 +215,7 @@ public class CommandParser {
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.AddTodoTaskCommand parseTodoCommand(String[] args) throws GrugCommandParserException {
+    private static GrugCommand.AddTaskCommand parseTodoCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args, Set.of());
@@ -224,7 +224,7 @@ public class CommandParser {
         }
 
         String details = String.join(" ", parsedArgs.inputs());
-        return new GrugCommand.AddTodoTaskCommand(new TodoTask(details));
+        return new GrugCommand.AddTaskCommand(new TodoTask(details));
     }
 
     /**
@@ -236,7 +236,7 @@ public class CommandParser {
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.AddDeadlineTaskCommand parseDeadlineCommand(String[] args)
+    private static GrugCommand.AddTaskCommand parseDeadlineCommand(String[] args)
             throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
@@ -252,7 +252,7 @@ public class CommandParser {
         String deadline = String.join(" ", parsedArgs.flagValues().get("/by"));
 
         try {
-            return new GrugCommand.AddDeadlineTaskCommand(new DeadlineTask(details, deadline));
+            return new GrugCommand.AddTaskCommand(new DeadlineTask(details, deadline));
         } catch (DateTimeParseException e) {
             String reason = "deadline must be in the format " + DeadlineTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("deadline", reason);
@@ -268,7 +268,7 @@ public class CommandParser {
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.AddEventTaskCommand parseEventCommand(String[] args) throws GrugCommandParserException {
+    private static GrugCommand.AddTaskCommand parseEventCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         Set<String> requiredFlags = Set.of("/from", "/to");
@@ -284,7 +284,7 @@ public class CommandParser {
         String to = String.join(" ", parsedArgs.flagValues().get("/to"));
 
         try {
-            return new GrugCommand.AddEventTaskCommand(new EventTask(details, from, to));
+            return new GrugCommand.AddTaskCommand(new EventTask(details, from, to));
         } catch (DateTimeParseException e) {
             String reason = "must be in the format " + EventTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("from / to", reason);

@@ -102,16 +102,8 @@ public sealed interface GrugCommand {
         public CommandResult execute(TaskList tasks, TaskStorage storage) {
             tasks.addTask(task);
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("added: ").append(task);
-
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString());
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString());
-            }
+            String msg = "added: " + task;
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -150,16 +142,9 @@ public sealed interface GrugCommand {
             Task task = optionalTask.get();
             task.markComplete();
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("Updated task %d: %s".formatted(taskNum, task));
+            String msg = "Updated task %d: %s".formatted(taskNum, task);
 
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString());
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString());
-            }
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -198,16 +183,9 @@ public sealed interface GrugCommand {
             Task task = optionalTask.get();
             task.markIncomplete();
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("Updated task %d: %s".formatted(taskNum, task));
+            String msg = "Updated task %d: %s".formatted(taskNum, task);
 
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString());
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString());
-            }
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -242,16 +220,9 @@ public sealed interface GrugCommand {
 
             Task removedTask = optionalRemoved.get();
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("deleted: %s".formatted(removedTask));
+            String msg = "deleted: %s".formatted(removedTask);
 
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString());
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString());
-            }
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -366,16 +337,8 @@ public sealed interface GrugCommand {
             Task task = taskOptional.get();
             task.setPriority(newPriority);
 
-            StringBuilder msg = new StringBuilder();
-            msg.append("Updated task %d: %s".formatted(taskNum, task));
-
-            try {
-                storage.saveTasks(tasks.getTasks());
-                return new CommandResult.Ok(msg.toString());
-            } catch (IOException e) {
-                msg.append("\nFailed to save tasks to ").append(storage.getFilepath());
-                return new CommandResult.Partial(msg.toString());
-            }
+            String msg = "Updated task %d: %s".formatted(taskNum, task);
+            return GrugCommand.saveTasksPostExecution(tasks, storage, msg);
         }
     }
 
@@ -396,4 +359,30 @@ public sealed interface GrugCommand {
      *         command loop should exit.
      */
     public abstract CommandResult execute(TaskList tasks, TaskStorage storage);
+
+    /**
+     * Attempts to save the tasks to the storage, but if it fails, returns a
+     * *Partial* success (not an Err).
+     *
+     * The reason why we return a *Partial* success instead of an Err is because
+     * this method is meant to be called at the end of a successful execution. If
+     * saving tasks fails, the primary result of the execution is thus still
+     * successful, so the execution is overall *partially* successful.
+     *
+     * @param tasks          The tasks to save.
+     * @param storage        The storage to save to.
+     * @param accumulatedMsg The existing messages that have been accumulated.
+     * @return {@link CommandResult.Ok} if successful, or
+     *         {@link CommandResult.Partial} with an appended error message if
+     *         unsuccessful.
+     */
+    private static CommandResult saveTasksPostExecution(TaskList tasks, TaskStorage storage, String accumulatedMsg) {
+        try {
+            storage.saveTasks(tasks.getTasks());
+            return new CommandResult.Ok(accumulatedMsg);
+        } catch (IOException e) {
+            String partialResultMessage = accumulatedMsg + "\nFailed to save tasks to " + storage.getFilepath();
+            return new CommandResult.Partial(partialResultMessage);
+        }
+    }
 }

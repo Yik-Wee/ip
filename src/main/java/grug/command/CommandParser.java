@@ -118,6 +118,7 @@ public class CommandParser {
         // input must have had a non-whitespace character, so splitting it must give an
         // array with at least length 1, so args[0] will not throw
         String[] args = input.split("\\s+");
+        assert args.length > 0;
         String commandString = args[0].toLowerCase();
 
         return switch (commandString) {
@@ -276,6 +277,10 @@ public class CommandParser {
             throw new GrugCommandParserException.InvalidArgument(
                     "from / to",
                     "must be in the format " + EventTask.DATE_TIME_INPUT_PATTERN);
+        } catch (IllegalArgumentException e) {
+            throw new GrugCommandParserException.InvalidArgument(
+                    "from / to",
+                    "from date/time `%s` must not occur after to date/time `%s`".formatted(from, to));
         }
     }
 

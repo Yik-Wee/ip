@@ -59,8 +59,7 @@ public class Grug {
      * {@code System.in} and outputs to {@code System.out}.
      */
     public Grug() {
-        Ui ui = new ConsoleUi(new Scanner(System.in), new PrintWriter(System.out));
-        this(DEFAULT_STORAGE_FILE, ui);
+        this(DEFAULT_STORAGE_FILE, new ConsoleUi(new Scanner(System.in), new PrintWriter(System.out)));
     }
 
     /**

@@ -108,7 +108,7 @@ public class Grug {
         try {
             command = CommandParser.parseInput(input);
         } catch (GrugCommandParserException e) {
-            ui.display(e.getMessage());
+            ui.displayError(e.getMessage());
             return false;
         }
 

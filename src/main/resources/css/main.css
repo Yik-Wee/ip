@@ -1,27 +1,29 @@
 .root {
-    main-color: rgb(237, 255, 242);
+    main-color: #363955;
     /* Create a looked-up color called "main-color" within root. */
     -fx-background-color: main-color;
 }
 
 .text-field {
-    -fx-background-color: #d9ffe2;
-    -fx-font: 20px "Arial";
+    -fx-background-color: #2F334D;
+    -fx-font: bold 20px "Arial";
+    -fx-text-fill: #FFFFFF;
 }
 
 .button {
-    -fx-background-color: mediumspringgreen;
+    -fx-background-color: #881122;
     -fx-font: italic bold 16px "Arial";
+    -fx-text-fill: #FFFFFF;
 }
 
 .button:hover {
-    -fx-background-color: cyan;
+    -fx-background-color: #c92039;
     -fx-font-size: 18px;
 }
 
 .button:pressed {
-    -fx-background-color: orange;
-    -fx-font-size: 20px;
+    -fx-background-color: #530c17;
+    -fx-font-size: 18px;
 }
 
 .scroll-pane,

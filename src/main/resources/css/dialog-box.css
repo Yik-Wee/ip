@@ -1,5 +1,5 @@
 .label {
-    -fx-background-color: #881122;
+    -fx-background-color: #235186;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
     -fx-border-width: 2px;
@@ -15,4 +15,12 @@
     -fx-font-family: "Monospaced";
     -fx-background-radius: 1em 1em 1em 0;
     -fx-border-radius: 1em 1em 1em 0;
+}
+
+.error-label,
+.error-label:focused {
+    -fx-background-color: #7F1D1D;
+    -fx-border-color: #FCA5A5;
+    -fx-border-width: 2px;
+    -fx-text-fill: #FEF2F2;
 }

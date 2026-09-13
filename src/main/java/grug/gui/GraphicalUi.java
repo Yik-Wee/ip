@@ -43,7 +43,8 @@ public class GraphicalUi implements Ui {
 
     @Override
     public void displayError(String message) {
-        this.display("ERROR!\n" + message);
+        DialogBox errorDialogBox = DialogBox.createFromErrorDialog(message);
+        this.dialogContainer.getChildren().add(errorDialogBox);
     }
 
     @Override

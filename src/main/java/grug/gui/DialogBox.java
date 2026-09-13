@@ -76,9 +76,21 @@ public class DialogBox extends HBox {
      * @return The {@link DialogBox} containing Grug's dialog text.
      */
     public static DialogBox createFromGrugDialog(String response) {
-        var db = new DialogBox(response, GRUG_IMAGE);
-        db.dialog.setFont(Font.font("Monospaced"));
-        db.flip();
-        return db;
+        DialogBox dialogBox = new DialogBox(response, GRUG_IMAGE);
+        dialogBox.dialog.setFont(Font.font("Monospaced"));
+        dialogBox.flip();
+        return dialogBox;
+    }
+
+    /**
+     * Creates a {@link DialogBox} that visually emphasizes an error response.
+     *
+     * @param response Grug's error response.
+     * @return The {@link DialogBox} containing the emphasized error response.
+     */
+    public static DialogBox createFromErrorDialog(String response) {
+        DialogBox dialogBox = createFromGrugDialog(response);
+        dialogBox.dialog.getStyleClass().add("error-label");
+        return dialogBox;
     }
 }

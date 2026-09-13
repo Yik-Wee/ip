@@ -1,4 +1,4 @@
-package grug.command;
+package grug.command.parser;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -9,6 +9,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import grug.command.AddTaskCommand;
+import grug.command.DeleteTaskCommand;
+import grug.command.EmptyCommand;
+import grug.command.FindTasksByDateCommand;
+import grug.command.FindTasksByDetailsCommand;
+import grug.command.GrugCommand;
+import grug.command.ListTasksCommand;
+import grug.command.MarkTaskCommand;
+import grug.command.QuitCommand;
+import grug.command.SetPriorityCommand;
+import grug.command.UnmarkTaskCommand;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.Task;
@@ -179,7 +190,7 @@ public class CommandParser {
         // no command given, e.g. user just presses enter without inputting anything, or
         // inputting whitespace
         if (input.isEmpty()) {
-            return new GrugCommand.EmptyCommand();
+            return new EmptyCommand();
         }
 
         // input must have had a non-whitespace character, so splitting it must give an
@@ -221,18 +232,18 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.QuitCommand} command instance.
+     * @return A new {@link QuitCommand} command instance.
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.QuitCommand parseQuitCommand(String[] args) throws GrugCommandParserException {
+    private static QuitCommand parseQuitCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         // only `bye` is valid, with no additional args
         if (args.length > 1) {
             throw new GrugCommandParserException.InvalidUsage("bye (with no arguments)");
         }
-        return new GrugCommand.QuitCommand();
+        return new QuitCommand();
     }
 
     /**
@@ -240,18 +251,18 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.ListTasksCommand} command instance.
+     * @return A new {@link ListTasksCommand} command instance.
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.ListTasksCommand parseListCommand(String[] args) throws GrugCommandParserException {
+    private static ListTasksCommand parseListCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         // only `list` is valid, with no additional args
         if (args.length > 1) {
             throw new GrugCommandParserException.InvalidUsage("list (with no arguments)");
         }
-        return new GrugCommand.ListTasksCommand();
+        return new ListTasksCommand();
     }
 
     /**
@@ -263,7 +274,7 @@ public class CommandParser {
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.AddTaskCommand parseTodoCommand(String[] args) throws GrugCommandParserException {
+    private static AddTaskCommand parseTodoCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
@@ -277,7 +288,7 @@ public class CommandParser {
 
         TodoTask todoTask = new TodoTask(details);
         todoTask.setPriority(priority);
-        return new GrugCommand.AddTaskCommand(todoTask);
+        return new AddTaskCommand(todoTask);
     }
 
     /**
@@ -289,7 +300,7 @@ public class CommandParser {
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.AddTaskCommand parseDeadlineCommand(String[] args)
+    private static AddTaskCommand parseDeadlineCommand(String[] args)
             throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
@@ -308,7 +319,7 @@ public class CommandParser {
         try {
             DeadlineTask deadlineTask = new DeadlineTask(details, deadline);
             deadlineTask.setPriority(priority);
-            return new GrugCommand.AddTaskCommand(deadlineTask);
+            return new AddTaskCommand(deadlineTask);
         } catch (DateTimeParseException e) {
             String reason = "deadline must be in the format " + DeadlineTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("deadline", reason);
@@ -324,7 +335,7 @@ public class CommandParser {
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.AddTaskCommand parseEventCommand(String[] args) throws GrugCommandParserException {
+    private static AddTaskCommand parseEventCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         Set<String> requiredFlags = Set.of("/from", "/to");
@@ -343,7 +354,7 @@ public class CommandParser {
         try {
             EventTask eventTask = new EventTask(details, from, to);
             eventTask.setPriority(priority);
-            return new GrugCommand.AddTaskCommand(eventTask);
+            return new AddTaskCommand(eventTask);
         } catch (DateTimeParseException e) {
             String reason = "must be in the format " + EventTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("from / to", reason);
@@ -380,11 +391,11 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.MarkTaskCommand} command instance.
+     * @return A new {@link MarkTaskCommand} command instance.
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.MarkTaskCommand parseMarkCommand(String[] args) throws GrugCommandParserException {
+    private static MarkTaskCommand parseMarkCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         // only `mark <tasknum>` is valid
@@ -394,7 +405,7 @@ public class CommandParser {
 
         String taskNumText = args[1];
         int taskNum = parseInt(taskNumText, "mark <tasknum>", "tasknum must be an integer");
-        return new GrugCommand.MarkTaskCommand(taskNum);
+        return new MarkTaskCommand(taskNum);
     }
 
     /**
@@ -402,11 +413,11 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.UnmarkTaskCommand} command instance.
+     * @return A new {@link UnmarkTaskCommand} command instance.
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.UnmarkTaskCommand parseUnmarkCommand(String[] args) throws GrugCommandParserException {
+    private static UnmarkTaskCommand parseUnmarkCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         // only `unmark <tasknum>` is valid
@@ -417,7 +428,7 @@ public class CommandParser {
 
         String taskNumText = args[1];
         int taskNum = parseInt(taskNumText, "unmark <tasknum>", "tasknum must be an integer");
-        return new GrugCommand.UnmarkTaskCommand(taskNum);
+        return new UnmarkTaskCommand(taskNum);
     }
 
     /**
@@ -425,11 +436,11 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.DeleteTaskCommand} command instance.
+     * @return A new {@link DeleteTaskCommand} command instance.
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.DeleteTaskCommand parseDeleteCommand(String[] args) throws GrugCommandParserException {
+    private static DeleteTaskCommand parseDeleteCommand(String[] args) throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
         // only `delete <tasknum>` is valid
@@ -439,7 +450,7 @@ public class CommandParser {
 
         String taskNumText = args[1];
         int taskNum = parseInt(taskNumText, "delete <tasknum>", "tasknum must be an integer");
-        return new GrugCommand.DeleteTaskCommand(taskNum);
+        return new DeleteTaskCommand(taskNum);
     }
 
     /**
@@ -447,11 +458,11 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.FindTasksByDateCommand} command instance.
+     * @return A new {@link FindTasksByDateCommand} command instance.
      * @throws GrugCommandParserException if something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.FindTasksByDateCommand parseFindByDateCommand(String[] args)
+    private static FindTasksByDateCommand parseFindByDateCommand(String[] args)
             throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
@@ -467,7 +478,7 @@ public class CommandParser {
 
         try {
             LocalDate targetDateTime = LocalDate.parse(target, Task.DATE_TIME_INPUT_FORMATTER);
-            return new GrugCommand.FindTasksByDateCommand(targetDateTime);
+            return new FindTasksByDateCommand(targetDateTime);
         } catch (DateTimeParseException e) {
             String reason = "must be in the format %s\n(but the time provided is ignored)"
                     .formatted(Task.DATE_TIME_INPUT_PATTERN);
@@ -480,11 +491,11 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.FindTasksByDetailsCommand} command instance.
+     * @return A new {@link FindTasksByDetailsCommand} command instance.
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.FindTasksByDetailsCommand parseFindByDetailsCommand(String[] args)
+    private static FindTasksByDetailsCommand parseFindByDetailsCommand(String[] args)
             throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
@@ -494,7 +505,7 @@ public class CommandParser {
         }
         String details = String.join(" ", parsedArgs.inputs());
 
-        return new GrugCommand.FindTasksByDetailsCommand(details);
+        return new FindTasksByDetailsCommand(details);
     }
 
     /**
@@ -502,11 +513,11 @@ public class CommandParser {
      *
      * @param args The list of arguments read from the input, including the initial
      *             command to quit as well (e.g. `{ "cmd", "arg1", "arg2", ... }`).
-     * @return A new {@link GrugCommand.SetPriorityCommand} command instance.
+     * @return A new {@link SetPriorityCommand} command instance.
      * @throws GrugCommandParserException If something went wrong parsing the args.
      * @throws IllegalArgumentException   If args is empty.
      */
-    private static GrugCommand.SetPriorityCommand parseSetPriorityCommand(String[] args)
+    private static SetPriorityCommand parseSetPriorityCommand(String[] args)
             throws GrugCommandParserException {
         requireNonEmptyArgs(args);
 
@@ -523,6 +534,6 @@ public class CommandParser {
         String errorReason = "tasknum %s is not an integer".formatted(taskNumText);
         int taskNum = parseInt(taskNumText, "set-priority <tasknum>", errorReason);
 
-        return new GrugCommand.SetPriorityCommand(taskNum, newPriority);
+        return new SetPriorityCommand(taskNum, newPriority);
     }
 }

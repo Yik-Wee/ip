@@ -1,4 +1,4 @@
-package grug.command;
+package grug.command.parser;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import grug.command.GrugCommand;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.Task;

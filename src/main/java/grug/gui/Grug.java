@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 import java.util.Optional;
 import java.util.Scanner;
 
-import grug.command.CommandParser;
 import grug.command.CommandResult;
 import grug.command.GrugCommand;
-import grug.command.GrugCommandParserException;
+import grug.command.parser.CommandParser;
+import grug.command.parser.GrugCommandParserException;
 import grug.storage.TaskStorage;
 import grug.storage.serde.TaskDeserializerException;
 import grug.task.TaskList;

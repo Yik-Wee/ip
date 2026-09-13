@@ -1,4 +1,4 @@
-package grug.command;
+package grug.command.parser;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
+import grug.command.GrugCommand;
 import grug.task.DeadlineTask;
 import grug.task.EventTask;
 import grug.task.TaskPriority;

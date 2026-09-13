@@ -1,4 +1,6 @@
-package grug.command;
+package grug.command.parser;
+
+import grug.command.GrugCommand;
 
 /**
  * The base class for the (checked) exceptions thrown when there was an error

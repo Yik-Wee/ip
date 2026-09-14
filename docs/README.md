@@ -109,8 +109,7 @@ Adds a todo task to the task list.
 
 Format: `todo DETAILS`
 
-> [!NOTE]
-> Extra whitespaces are removed from `DETAILS`
+*Note: Extra whitespaces are removed from `DETAILS`*
 
 Example: `todo go for a run`
 
@@ -124,8 +123,7 @@ Adds a deadline task to the task list.
 
 Format: `deadline DETAILS /by DEADLINE`, where `DEADLINE` is a [DateTime](#date-times)
 
-> [!NOTE]
-> Extra whitespaces are removed from `DETAILS`
+*Note: Extra whitespaces are removed from `DETAILS`*
 
 Example: `deadline finish essay /by 2026-09-18 2359`
 
@@ -139,8 +137,7 @@ Adds an event task to the task list
 
 Format: `event DETAILS /from START /to END`, where `START` and `END` are [DateTime](#date-times)s
 
-> [!NOTE]
-> Extra whitespaces are removed from `DETAILS`
+*Note: Extra whitespaces are removed from `DETAILS`*
 
 Example:
 `event christmas break /from 2026-12-24 0000 /to 2026-12-25 2359`
@@ -169,8 +166,7 @@ Marks a task as complete.
 
 Format: `mark TASKNUM`, where `TASKNUM` is the task's number starting from `1`
 
-> [!NOTE]
-> If `TASKNUM` is out of range, you'll see a helpful error message instead
+*Note: If `TASKNUM` is out of range, you'll see a helpful error message instead*
 
 Example: `mark 1`
 
@@ -184,8 +180,7 @@ Unmarks a task, setting it as incomplete.
 
 Format: `unmark TASKNUM`, where `TASKNUM` is the task's number starting from `1`
 
-> [!NOTE]
-> If `TASKNUM` is out of range, you'll see a helpful error message instead
+*Note: If `TASKNUM` is out of range, you'll see a helpful error message instead*
 
 Example: `unmark 1`
 
@@ -199,11 +194,9 @@ Deletes a task from the task list.
 
 Format: `delete TASKNUM`, where `TASKNUM` is the task's number starting from `1`
 
-> [!NOTE]
-> If `TASKNUM` is out of range, you'll see a helpful error message instead
+*Note: If `TASKNUM` is out of range, you'll see a helpful error message instead*
 
-> [!CAUTION]
-> This will permanently delete the task. Make sure you have the correct task number before deleting
+***WARNING: This will permanently delete the task. Make sure you have the correct task number before deleting***
 
 Example: `delete 1`
 
@@ -217,10 +210,7 @@ Updates a task's priority.
 
 Format: `set-priority TASKNUM /priority VALUE`, where `TASKNUM` is the task's number starting from `1`, and `VALUE` is a [Priority Value](#priorities)
 
-> [!NOTE]
-> If `TASKNUM` is out of range, you'll see a helpful error message instead
->
-> If `VALUE` is invalid, you'll see a helpful error message instead
+*Note: If `TASKNUM` is out of range, or `VALUE` is invalid, you'll see a helpful error message instead*
 
 Example: `set-priority 1 /priority URG`
 
@@ -234,8 +224,7 @@ Finds tasks whose details **contain** the search query.
 
 Format: `find DETAILS`
 
-> [!NOTE]
-> Extra whitespaces are removed from `DETAILS`
+*Note: Extra whitespaces are removed from `DETAILS`*
 
 Example: `find christmas`
 
@@ -250,8 +239,7 @@ Finds deadlines and events that occur on the given date.
 
 Format: `find-on DATE`, where `DATE` is a [DateTime](#date-times) ***whose time is ignored***
 
-> [!IMPORTANT]
-> The `DATE`'s time, if provided, is ***ignored***
+*Note: The `DATE`'s time, if provided, is **ignored***
 
 Example: `find-on 12-24`
 
@@ -276,9 +264,10 @@ Then, the application is closed.
 ### Saving and Loading
 Tasks are automatically saved to `tasks.txt` by the app whenever the task list is modified, and loaded on startup.
 
-> [!WARNING]
-> If your save file is corrupted, Grug will show a helpful error message showing which part of the file was corrupted.
-> 
-> Then, Grug will attempt to backup your save file to `tasks.bak.txt` and overwrite `tasks.txt`.
-> 
-> If the backup fails, your existing save file ***may be overwritten if you run commands that update the task list***. But don't panic! You can simply quit the application, move your save file somewhere safe and attempt to fix the file.
+***WARNING:***
+
+If your save file is corrupted, Grug will show a helpful error message showing which part of the file was corrupted.
+
+Then, Grug will attempt to backup your save file to `tasks.bak.txt` and overwrite `tasks.txt`.
+
+If the backup fails, your existing save file ***may be overwritten if you run commands that update the task list***. But don't panic! You can simply quit the application, move your save file somewhere safe and attempt to fix the file.

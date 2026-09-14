@@ -3,6 +3,7 @@ package grug.task;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 
 /**
@@ -12,11 +13,26 @@ import java.time.temporal.ChronoField;
 public abstract class Task {
     public static final String DATE_TIME_INPUT_PATTERN = "[yyyy-]MM-dd[ HH[:]mm]";
     public static final DateTimeFormatter DATE_TIME_INPUT_FORMATTER = new DateTimeFormatterBuilder()
-            .appendPattern(DATE_TIME_INPUT_PATTERN)
-            .parseDefaulting(ChronoField.YEAR_OF_ERA, LocalDate.now().getYear())
+            .optionalStart()
+            .appendValue(ChronoField.YEAR, 4)
+            .appendLiteral('-')
+            .optionalEnd()
+            .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+            .appendLiteral('-')
+            .appendValue(ChronoField.DAY_OF_MONTH, 2)
+            .optionalStart()
+            .appendLiteral(' ')
+            .appendValue(ChronoField.HOUR_OF_DAY, 2)
+            .optionalStart()
+            .appendLiteral(':')
+            .optionalEnd()
+            .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+            .optionalEnd()
+            .parseDefaulting(ChronoField.YEAR, LocalDate.now().getYear())
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-            .toFormatter();
+            .toFormatter()
+            .withResolverStyle(ResolverStyle.STRICT);
 
     protected static final String DATE_TIME_DISPLAY_PATTERN = "MMM dd yyyy HHmm";
     protected static final DateTimeFormatter DATE_TIME_DISPLAY_FORMATTER = DateTimeFormatter

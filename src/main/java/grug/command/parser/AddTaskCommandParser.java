@@ -45,7 +45,7 @@ final class AddTaskCommandParser {
             deadlineTask.setPriority(priority);
             return new AddTaskCommand(deadlineTask);
         } catch (DateTimeParseException e) {
-            String reason = "deadline must be in the format " + DeadlineTask.DATE_TIME_INPUT_PATTERN;
+            String reason = "deadline must be a valid date in the format " + DeadlineTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("deadline", reason);
         }
     }
@@ -81,7 +81,7 @@ final class AddTaskCommandParser {
             eventTask.setPriority(priority);
             return new AddTaskCommand(eventTask);
         } catch (DateTimeParseException e) {
-            String reason = "must be in the format " + EventTask.DATE_TIME_INPUT_PATTERN;
+            String reason = "must be a valid date in the format " + EventTask.DATE_TIME_INPUT_PATTERN;
             throw new GrugCommandParserException.InvalidArgument("from / to", reason);
         } catch (IllegalArgumentException e) {
             String reason = "from date/time `%s` must not occur after to date/time `%s`".formatted(from, to);

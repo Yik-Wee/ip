@@ -2,6 +2,8 @@ package grug.gui;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.NoSuchFileException;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -145,9 +147,14 @@ public class Grug {
             ui.displayWarning("Found malformed tasks file `%s`: %s"
                     .formatted(storage.getFilepath(), e.getMessage()));
             this.tryBackupTasksFile();
-        } catch (IOException e) {
-            ui.display("There were no tasks to load, or `%s` could not be opened".formatted(
+        } catch (NoSuchFileException e) {
+            ui.display("No tasks to load: `%s` does not exist".formatted(storage.getFilepath()));
+        } catch (AccessDeniedException e) {
+            ui.displayError("Could not open tasks file `%s`: access denied".formatted(
                     storage.getFilepath()));
+        } catch (IOException e) {
+            ui.displayError("Could not open or read tasks file `%s`: %s".formatted(
+                    storage.getFilepath(), e.getMessage()));
         }
     }
 

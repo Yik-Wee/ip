@@ -2,8 +2,6 @@ package grug.storage;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -79,7 +77,7 @@ public final class TaskStorage {
      */
     public void saveTasks(List<Task> tasks) throws IOException {
         // the writer is automatically closed at the end of this try-resource block
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.filepath))) {
+        try (BufferedWriter bufferedWriter = Files.newBufferedWriter(Path.of(this.filepath))) {
             // replace the contents of the entire file every save, rather than modify based
             // on some diffs (which is unnecessarily complex)
             String contents = tasks.stream()
@@ -94,16 +92,15 @@ public final class TaskStorage {
      * Loads the tasks to the file specified by the storage filepath
      * {@link #getFilepath()}.
      *
-     * @throws IOException               If the named file exists but is a directory
-     *                                   rather than a regular file, does not exist
-     *                                   but cannot be created, or cannot be opened
-     *                                   or written to for any other reason.
+     * @throws IOException               If the file does not exist, access is denied,
+     *                                   or it cannot be opened or read for another
+     *                                   reason.
      * @throws TaskDeserializerException If there was an error deserializing the
      *                                   saved tasks.
      */
     public List<Task> loadTasks() throws IOException, TaskDeserializerException {
         String serializedTasks;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(this.filepath))) {
+        try (BufferedReader bufferedReader = Files.newBufferedReader(Path.of(this.filepath))) {
             serializedTasks = bufferedReader.readAllAsString();
         }
 

@@ -30,12 +30,12 @@ public record DeleteTaskCommand(int taskNum) implements GrugCommand {
         // empty optional if index out of bounds
         Optional<Task> optionalRemoved = tasks.removeTask(taskIdx);
         if (optionalRemoved.isEmpty()) {
-            return new CommandResult.Err("Can't find task number %d".formatted(taskNum));
+            return new CommandResult.Err("Guh. Can't find task number %d".formatted(taskNum));
         }
 
         Task removedTask = optionalRemoved.get();
 
-        String msg = "deleted: %s".formatted(removedTask);
+        String msg = "Bazinga! Deleted: %s".formatted(removedTask);
 
         try {
             storage.saveTasks(tasks.getTasks());

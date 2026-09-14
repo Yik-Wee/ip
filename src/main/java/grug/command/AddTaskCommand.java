@@ -25,7 +25,7 @@ public record AddTaskCommand(Task task) implements GrugCommand {
     public CommandResult execute(TaskList tasks, TaskStorage storage) {
         tasks.addTask(task);
 
-        String msg = "added: " + task;
+        String msg = "Bazinga! Added: " + task;
         try {
             storage.saveTasks(tasks.getTasks());
             return new CommandResult.Ok(msg);

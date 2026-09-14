@@ -22,7 +22,7 @@ public record ListTasksCommand() implements GrugCommand {
     @Override
     public CommandResult execute(TaskList tasks, TaskStorage storage) {
         if (tasks.isEmpty()) {
-            return new CommandResult.Ok("No tasks added.");
+            return new CommandResult.Ok("Buh. No tasks added");
         }
 
         String msg = IntStream.range(0, tasks.getSize())

@@ -29,7 +29,7 @@ public record FindTasksByDetailsCommand(String detailsSubstring) implements Grug
     @Override
     public CommandResult execute(TaskList tasks, TaskStorage storage) {
         if (tasks.isEmpty()) {
-            return new CommandResult.Ok("No tasks added.");
+            return new CommandResult.Ok("Buh. No tasks added");
         }
 
         String targetLower = detailsSubstring.strip().replaceAll("\\s+", " ").toLowerCase();
@@ -39,7 +39,7 @@ public record FindTasksByDetailsCommand(String detailsSubstring) implements Grug
                 .collect(Collectors.joining("\n"));
 
         if (msg.isEmpty()) {
-            return new CommandResult.Ok("No matching tasks found.");
+            return new CommandResult.Ok("Buh. No matching tasks found.");
         }
 
         return new CommandResult.Ok(msg.toString().stripTrailing());

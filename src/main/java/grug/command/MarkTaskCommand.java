@@ -36,13 +36,13 @@ public record MarkTaskCommand(int taskNum) implements GrugCommand {
         // empty optional if index out of bounds
         Optional<Task> optionalTask = tasks.getTask(taskIdx);
         if (optionalTask.isEmpty()) {
-            return new CommandResult.Err("Can't find task number %d".formatted(taskNum));
+            return new CommandResult.Err("Guh. Can't find task number %d".formatted(taskNum));
         }
 
         Task task = optionalTask.get();
         task.markComplete();
 
-        String msg = "Updated task %d: %s".formatted(taskNum, task);
+        String msg = "Bazinga! Updated task %d: %s".formatted(taskNum, task);
 
         try {
             storage.saveTasks(tasks.getTasks());

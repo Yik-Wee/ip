@@ -71,6 +71,7 @@ Example:
 
 ### Priorities
 You can mark a task with 5 different priorities:
+
 | Priority Level       | Value |
 | -------------------- | ----- |
 | URGENT               | `URG` |
@@ -79,13 +80,13 @@ You can mark a task with 5 different priorities:
 | LOW                  | `LOW` |
 | OPTIONAL             | `OPT` |
 
-> [!NOTE]
-> The `Value` column represents the value to pass to the priority flag, e.g. `/priority LOW`.
+*NOTE: The `Value` column represents the value to pass to the priority flag, e.g. `/priority LOW`.*
 
 ### Tasks
 Tasks are displayed in the format `[Task Type][Completion][Priority Value] DETAILS`.
 
 Task Type:
+
 | Task Type | Display |
 | --------- | ------- |
 | todo      | `T`     |
@@ -93,6 +94,7 @@ Task Type:
 | event     | `E`     |
 
 Completion:
+
 | Completion | Display             |
 | ---------- | ------------------- |
 | true       | `X`                 |

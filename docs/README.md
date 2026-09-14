@@ -6,6 +6,7 @@ Grug is a text-based caveman chatbot for people to manage their tasks. You can a
 ## Table of Contents
 - [Grug User Guide](#grug-user-guide)
   - [Table of Contents](#table-of-contents)
+  - [Quickstart](#quickstart)
   - [The Command Format](#the-command-format)
     - [Arguments](#arguments)
     - [Date-Times](#date-times)
@@ -27,7 +28,17 @@ Grug is a text-based caveman chatbot for people to manage their tasks. You can a
     - [Quitting](#quitting)
     - [Saving and Loading](#saving-and-loading)
 
+## Quickstart
+1. Ensure you have [Java 25](https://www.oracle.com/asean/java/technologies/downloads/#java25) installed
+2. Download `grug.jar` from the [latest release](https://github.com/Yik-Wee/ip/releases/latest)
+3. Either double-click `grug.jar` in your file manager, or run `java -jar grug.jar`
+4. A window will pop up and you can start entering commands! See [features](#features) for a full list of commands
+
 ## The Command Format
+Learn how the inputs and outputs of commands are formatted.
+
+*Skip to [features](#features) to see the full list of commands*.
+
 ### Arguments
 Text in `UPPER_CASE` are the arguments you provide.
 

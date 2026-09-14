@@ -43,7 +43,7 @@ public class FindCommandParser {
             LocalDate targetDateTime = LocalDate.parse(target, Task.DATE_TIME_INPUT_FORMATTER);
             return new FindTasksByDateCommand(targetDateTime);
         } catch (DateTimeParseException e) {
-            String reason = "must be in the format %s\n(but the time provided is ignored)"
+            String reason = "must be a valid date in the format %s\n(but the time provided is ignored)"
                     .formatted(Task.DATE_TIME_INPUT_PATTERN);
             throw new GrugCommandParserException.InvalidArgument("find-on", reason);
         }

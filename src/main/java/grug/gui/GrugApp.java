@@ -1,6 +1,7 @@
 package grug.gui;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,21 +15,29 @@ import javafx.stage.Stage;
 public class GrugApp extends Application {
     @Override
     public void start(Stage stage) {
+        URL mainWindowResource = GrugApp.class.getResource("/view/MainWindow.fxml");
+        if (mainWindowResource == null) {
+            throw new IllegalStateException("Could not initialize GUI: MainWindow.fxml was not found");
+        }
+
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(GrugApp.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane ap = fxmlLoader.load();
-            Scene scene = new Scene(ap);
+            FXMLLoader fxmlLoader = new FXMLLoader(mainWindowResource);
+            AnchorPane mainWindowRoot = fxmlLoader.load();
+            Scene scene = new Scene(mainWindowRoot);
             stage.setScene(scene);
 
             stage.setMinHeight(220);
             stage.setMinWidth(417);
 
-            MainWindow mainWindowController = fxmlLoader.<MainWindow>getController();
+            MainWindow mainWindowController = fxmlLoader.getController();
+            if (mainWindowController == null) {
+                throw new IllegalStateException("Could not initialize GUI: MainWindow controller was not created");
+            }
             mainWindowController.initializeGrugBackend();
 
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Could not initialize GUI from MainWindow.fxml", e);
         }
     }
 }

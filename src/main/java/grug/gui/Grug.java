@@ -2,6 +2,8 @@ package grug.gui;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.NoSuchFileException;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -138,16 +140,36 @@ public class Grug {
      * Loads tasks from the storage and displays any errors.
      */
     public void loadTasks() {
-        ui.display("Loading tasks from %s...", storage.getFilepath());
         try {
             this.tasks = new TaskList(storage.loadTasks());
             ui.display("Loaded tasks from %s", storage.getFilepath());
         } catch (TaskDeserializerException e) {
-            ui.displayWarning("May overwrite malformed tasks file `%s`: %s".formatted(
-                    this.storage.getFilepath(), e.getMessage()));
+            ui.displayWarning("Found malformed tasks file `%s`: %s"
+                    .formatted(storage.getFilepath(), e.getMessage()));
+            this.tryBackupTasksFile();
+        } catch (NoSuchFileException e) {
+            ui.display("No tasks to load: `%s` does not exist".formatted(storage.getFilepath()));
+        } catch (AccessDeniedException e) {
+            ui.displayError("Could not open tasks file `%s`: access denied".formatted(
+                    storage.getFilepath()));
         } catch (IOException e) {
-            ui.display("No tasks to load (or `%s` could not be opened)".formatted(
-                    this.storage.getFilepath()));
+            ui.displayError("Could not open or read tasks file `%s`: %s".formatted(
+                    storage.getFilepath(), e.getMessage()));
+        }
+    }
+
+    private void tryBackupTasksFile() {
+        String primaryFilepath = storage.getFilepath();
+
+        try {
+            String backupFilepath = storage.moveTasksFileToBackup();
+            ui.displayWarning("Malformed tasks file `%s` was moved to `%s`".formatted(
+                    primaryFilepath, backupFilepath));
+        } catch (IOException backupException) {
+            ui.displayError("Malformed tasks file `%s` could not be moved to a backup: %s".formatted(
+                    primaryFilepath, backupException.getMessage()));
+            ui.displayWarning("Tasks file `%s` will be overwritten. Use the `bye` command to cancel."
+                    .formatted(primaryFilepath));
         }
     }
 

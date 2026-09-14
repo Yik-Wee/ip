@@ -34,11 +34,13 @@ public class CommandParser {
     /**
      * Holds the result of the parsing.
      *
-     * @param command    The main command.
-     * @param inputs     The non-flag inputs passed to the command.
-     * @param flagValues A Map that maps the flag to its values.
+     * @param command         The main command.
+     * @param inputs          The non-flag inputs passed to the command.
+     * @param flagValues      A map that maps each normalized flag to its values.
+     * @param flagOccurrences A map that records how many times each flag occurs.
      */
-    private record ParsedArgs(String command, List<String> inputs, Map<String, List<String>> flagValues) {
+    private record ParsedArgs(String command, List<String> inputs, Map<String, List<String>> flagValues,
+            Map<String, Integer> flagOccurrences) {
         /**
          * Checks that the {@code flagValues} contain all the flags specified by
          * {@code requiredFlags}, and their values are non-empty (i.e. values are
@@ -55,11 +57,32 @@ public class CommandParser {
                     .allMatch(values -> values != null && !values.isEmpty());
             return areAllValuesNonEmpty;
         }
+
+        /**
+         * Checks that only the allowed flags occur and that each flag occurs at most
+         * once.
+         *
+         * @param allowedFlags The flags accepted by the command.
+         * @throws GrugCommandParserException If an unknown or repeated flag occurs.
+         */
+        public void validateFlags(Set<String> allowedFlags) throws GrugCommandParserException {
+            for (Map.Entry<String, Integer> entry : flagOccurrences.entrySet()) {
+                String flag = entry.getKey();
+                if (!allowedFlags.contains(flag)) {
+                    throw new GrugCommandParserException.InvalidArgument(flag, "unknown flag");
+                }
+                if (entry.getValue() > 1) {
+                    throw new GrugCommandParserException.InvalidArgument(
+                            flag, "flag must not be specified more than once");
+                }
+            }
+        }
     }
 
     /**
      * Parses the list of args into the command, inputs and flag values. Flags start
-     * with {@code /}.
+     * with {@code /}, are case-insensitive, and may be escaped with an additional
+     * slash when a literal value beginning with a slash is required.
      *
      * e.g.
      *
@@ -90,15 +113,16 @@ public class CommandParser {
      */
     private static ParsedArgs parseArgs(String[] args) {
         if (args.length == 0) {
-            return new ParsedArgs("", new ArrayList<>(0), new HashMap<>(0));
+            return new ParsedArgs("", new ArrayList<>(0), new HashMap<>(0), new HashMap<>(0));
         }
 
         String command = args[0];
         List<String> inputs = new ArrayList<>();
         HashMap<String, List<String>> flagValues = new HashMap<>();
+        HashMap<String, Integer> flagOccurrences = new HashMap<>();
 
         if (args.length == 1) {
-            return new ParsedArgs(command, inputs, flagValues);
+            return new ParsedArgs(command, inputs, flagValues, flagOccurrences);
         }
 
         String currentFlag = null;
@@ -107,12 +131,18 @@ public class CommandParser {
         for (int i = 1; i < args.length; i++) {
             String token = args[i];
 
-            boolean isFlag = token.startsWith("/");
+            boolean isEscapedSlash = token.startsWith("//");
+            boolean isFlag = token.startsWith("/") && !isEscapedSlash;
             if (isFlag) {
                 // our token is a flag, add subsequent tokens to the flag's values
-                currentFlag = token;
-                flagValues.putIfAbsent(token, new ArrayList<>());
+                currentFlag = token.toLowerCase();
+                flagValues.putIfAbsent(currentFlag, new ArrayList<>());
+                flagOccurrences.merge(currentFlag, 1, Integer::sum);
                 continue;
+            }
+
+            if (isEscapedSlash) {
+                token = token.substring(1);
             }
 
             if (currentFlag == null) {
@@ -122,7 +152,7 @@ public class CommandParser {
             }
         }
 
-        return new ParsedArgs(command, inputs, flagValues);
+        return new ParsedArgs(command, inputs, flagValues, flagOccurrences);
     }
 
     /**
@@ -278,6 +308,7 @@ public class CommandParser {
         requireNonEmptyArgs(args);
 
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
+        parsedArgs.validateFlags(Set.of("/priority"));
         if (parsedArgs.inputs().isEmpty()) {
             throw new GrugCommandParserException.InvalidUsage(
                     "todo <details> [%s]".formatted(getPriorityFlagUsage()));
@@ -306,6 +337,7 @@ public class CommandParser {
 
         Collection<String> requiredFlags = Set.of("/by");
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
+        parsedArgs.validateFlags(Set.of("/by", "/priority"));
 
         if (parsedArgs.inputs().isEmpty() || !parsedArgs.hasNonEmptyFlagValues(requiredFlags)) {
             String usage = "deadline <details> /by <%s>".formatted(DeadlineTask.DATE_TIME_INPUT_PATTERN);
@@ -340,6 +372,7 @@ public class CommandParser {
 
         Set<String> requiredFlags = Set.of("/from", "/to");
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
+        parsedArgs.validateFlags(Set.of("/from", "/to", "/priority"));
 
         if (parsedArgs.inputs().isEmpty() || !parsedArgs.hasNonEmptyFlagValues(requiredFlags)) {
             String usage = "event <details> /from <from> /to <to>";
@@ -473,6 +506,7 @@ public class CommandParser {
         }
 
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
+        parsedArgs.validateFlags(Set.of());
         List<String> datetimeTokens = parsedArgs.inputs();
         String target = String.join(" ", datetimeTokens);
 
@@ -500,6 +534,7 @@ public class CommandParser {
         requireNonEmptyArgs(args);
 
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
+        parsedArgs.validateFlags(Set.of());
         if (parsedArgs.inputs().isEmpty()) {
             throw new GrugCommandParserException.InvalidUsage("find <details>");
         }
@@ -522,11 +557,11 @@ public class CommandParser {
         requireNonEmptyArgs(args);
 
         CommandParser.ParsedArgs parsedArgs = CommandParser.parseArgs(args);
+        parsedArgs.validateFlags(Set.of("/priority"));
 
         TaskPriority newPriority = parseTaskPriorityFrom(parsedArgs, null);
         if (parsedArgs.inputs().size() != 1 || newPriority == null) {
             String usage = "set-priority <tasknum> " + getPriorityFlagUsage();
-            System.out.println(parsedArgs);
             throw new GrugCommandParserException.InvalidUsage(usage);
         }
 

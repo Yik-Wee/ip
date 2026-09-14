@@ -5,6 +5,9 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +34,39 @@ public final class TaskStorage {
 
     public String getFilepath() {
         return this.filepath;
+    }
+
+    /**
+     * Renames the tasks file by inserting {@code .bak} before its extension.
+     * i.e. {@code file.ext}'s backup is {@code file.bak.ext} and {@code file}'s
+     * backup is {@code file.bak}
+     *
+     * @return The filepath of the renamed backup file.
+     * @throws IOException                If the tasks file cannot be renamed.
+     * @throws FileAlreadyExistsException If the backup file already exists.
+     */
+    public String moveTasksFileToBackup() throws IOException {
+        Path sourcePath = Path.of(this.filepath);
+        Path filenamePath = sourcePath.getFileName();
+        if (filenamePath == null) {
+            throw new IOException("Tasks filepath does not identify a file: " + this.filepath);
+        }
+
+        // create backup filename file.bak.ext or file.bak (if no extension)
+        String filename = filenamePath.toString();
+        int extensionIndex = filename.lastIndexOf('.');
+        String backupFilename;
+        if (extensionIndex > 0) {
+            backupFilename = filename.substring(0, extensionIndex)
+                    + ".bak"
+                    + filename.substring(extensionIndex);
+        } else {
+            backupFilename = filename + ".bak";
+        }
+
+        Path backupPath = sourcePath.resolveSibling(backupFilename);
+        Files.move(sourcePath, backupPath);
+        return backupPath.toString();
     }
 
     /**

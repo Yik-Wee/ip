@@ -138,16 +138,31 @@ public class Grug {
      * Loads tasks from the storage and displays any errors.
      */
     public void loadTasks() {
-        ui.display("Loading tasks from %s...", storage.getFilepath());
         try {
             this.tasks = new TaskList(storage.loadTasks());
             ui.display("Loaded tasks from %s", storage.getFilepath());
         } catch (TaskDeserializerException e) {
-            ui.displayWarning("May overwrite malformed tasks file `%s`: %s".formatted(
-                    this.storage.getFilepath(), e.getMessage()));
+            ui.displayWarning("Found malformed tasks file `%s`: %s"
+                    .formatted(storage.getFilepath(), e.getMessage()));
+            this.tryBackupTasksFile();
         } catch (IOException e) {
-            ui.display("No tasks to load (or `%s` could not be opened)".formatted(
-                    this.storage.getFilepath()));
+            ui.display("There were no tasks to load, or `%s` could not be opened".formatted(
+                    storage.getFilepath()));
+        }
+    }
+
+    private void tryBackupTasksFile() {
+        String primaryFilepath = storage.getFilepath();
+
+        try {
+            String backupFilepath = storage.moveTasksFileToBackup();
+            ui.displayWarning("Malformed tasks file `%s` was moved to `%s`".formatted(
+                    primaryFilepath, backupFilepath));
+        } catch (IOException backupException) {
+            ui.displayError("Malformed tasks file `%s` could not be moved to a backup: %s".formatted(
+                    primaryFilepath, backupException.getMessage()));
+            ui.displayWarning("Tasks file `%s` will be overwritten. Use the `bye` command to cancel."
+                    .formatted(primaryFilepath));
         }
     }
 

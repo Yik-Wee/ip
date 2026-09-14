@@ -49,7 +49,7 @@ class GrugCommandTest {
         TaskList emptyTasks = new TaskList();
         TaskList populatedTasks = new TaskList(List.of(new TodoTask("buy milk")));
 
-        assertEquals(new CommandResult.Ok("No tasks added.", false),
+        assertEquals(new CommandResult.Ok("Buh. No tasks added", false),
                 new ListTasksCommand().execute(emptyTasks, storage));
         assertEquals(new CommandResult.Ok("1. [T][ ][MED] buy milk", false),
                 new ListTasksCommand().execute(populatedTasks, storage));
@@ -99,7 +99,7 @@ class GrugCommandTest {
         CommandResult result = new SetPriorityCommand(1, TaskPriority.URGENT)
                 .execute(tasks, storage);
 
-        assertEquals(new CommandResult.Ok("Updated task 1: [T][ ][URG] important task", false), result);
+        assertEquals(new CommandResult.Ok("Bazinga! Updated task 1: [T][ ][URG] important task", false), result);
         assertEquals(TaskPriority.URGENT, task.getPriority());
         assertEquals(TaskPriority.URGENT, storage.loadTasks().get(0).getPriority());
     }
@@ -110,9 +110,9 @@ class GrugCommandTest {
         TaskList tasks = new TaskList(List.of(task));
         TaskStorage storage = createTempStorage();
 
-        assertEquals(new CommandResult.Err("Can't find task number 0", false),
+        assertEquals(new CommandResult.Err("Guh. Can't find task number 0", false),
                 new SetPriorityCommand(0, TaskPriority.HIGH).execute(tasks, storage));
-        assertEquals(new CommandResult.Err("Can't find task number 2", false),
+        assertEquals(new CommandResult.Err("Guh. Can't find task number 2", false),
                 new SetPriorityCommand(2, TaskPriority.LOW).execute(tasks, storage));
         assertEquals(TaskPriority.MEDIUM, task.getPriority());
     }
@@ -123,11 +123,11 @@ class GrugCommandTest {
         TaskList tasks = new TaskList(List.of(new TodoTask("task")));
         TaskStorage storage = createTempStorage();
 
-        assertEquals(new CommandResult.Err("Can't find task number 0", false),
+        assertEquals(new CommandResult.Err("Guh. Can't find task number 0", false),
                 new MarkTaskCommand(0).execute(tasks, storage));
-        assertEquals(new CommandResult.Err("Can't find task number 0", false),
+        assertEquals(new CommandResult.Err("Guh. Can't find task number 0", false),
                 new UnmarkTaskCommand(0).execute(tasks, storage));
-        assertEquals(new CommandResult.Err("Can't find task number 2", false),
+        assertEquals(new CommandResult.Err("Guh. Can't find task number 2", false),
                 new DeleteTaskCommand(2).execute(tasks, storage));
         assertEquals(1, tasks.getSize());
         assertFalse(tasks.getTask(0).orElseThrow().isCompleted());

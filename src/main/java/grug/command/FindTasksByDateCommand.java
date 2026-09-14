@@ -26,7 +26,7 @@ public record FindTasksByDateCommand(LocalDate date) implements GrugCommand {
     @Override
     public CommandResult execute(TaskList tasks, TaskStorage storage) {
         if (tasks.isEmpty()) {
-            return new CommandResult.Ok("No tasks added.");
+            return new CommandResult.Ok("Buh. No tasks added");
         }
 
         String msg = IntStream.range(0, tasks.getSize())
@@ -35,7 +35,7 @@ public record FindTasksByDateCommand(LocalDate date) implements GrugCommand {
                 .collect(Collectors.joining("\n"));
 
         if (msg.isEmpty()) {
-            return new CommandResult.Ok("No tasks occuring on that date");
+            return new CommandResult.Ok("Buh. No tasks occuring on that date");
         }
 
         return new CommandResult.Ok(msg.toString().stripTrailing());

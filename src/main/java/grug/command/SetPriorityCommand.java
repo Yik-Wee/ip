@@ -38,13 +38,13 @@ public record SetPriorityCommand(int taskNum, TaskPriority newPriority) implemen
         int taskIdx = taskNum - 1;
         Optional<Task> taskOptional = tasks.getTask(taskIdx);
         if (taskOptional.isEmpty()) {
-            return new CommandResult.Err("Can't find task number %d".formatted(taskNum));
+            return new CommandResult.Err("Guh. Can't find task number %d".formatted(taskNum));
         }
 
         Task task = taskOptional.get();
         task.setPriority(newPriority);
 
-        String msg = "Updated task %d: %s".formatted(taskNum, task);
+        String msg = "Bazinga! Updated task %d: %s".formatted(taskNum, task);
         try {
             storage.saveTasks(tasks.getTasks());
             return new CommandResult.Ok(msg);

@@ -26,6 +26,8 @@ public class GrugApp extends Application {
             Scene scene = new Scene(mainWindowRoot);
             stage.setScene(scene);
 
+            stage.setTitle("Grug");
+
             stage.setMinHeight(220);
             stage.setMinWidth(417);
 

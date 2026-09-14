@@ -127,7 +127,7 @@ class TaskDeserializerTest {
     }
 
     @Test
-    void deserializeMany_firstTaskMissingHeader_ignoresFirstTask() throws Exception {
+    void deserializeMany_firstTaskMissingHeader_throwsDeserializationException() throws Exception {
         String serialized = """
                 details = should skip this
 
